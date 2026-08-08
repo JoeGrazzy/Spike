@@ -87,62 +87,102 @@
             --card-bg: rgba(255, 255, 255, 0.9);
         }
 
-        body.light-mode .create-textarea,
-        body.light-mode .comment-input,
+        /* Light mode overrides for text inputs */
+        body.light-mode .create-textarea {
+            background: var(--input-bg);
+            border-color: var(--input-border);
+            color: #0f1824;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        body.light-mode .create-textarea:focus {
+            background: var(--input-focus-bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        body.light-mode .create-textarea::placeholder {
+            color: #8a9bb5;
+        }
+        body.light-mode .comment-input {
+            background: var(--input-bg);
+            border-color: var(--input-border);
+            color: #0f1824;
+        }
+        body.light-mode .comment-input:focus {
+            background: var(--input-focus-bg);
+            border-color: var(--primary);
+        }
         body.light-mode .edit-post-textarea {
             background: var(--input-bg);
             border-color: var(--input-border);
             color: #0f1824;
         }
-        body.light-mode .create-textarea:focus,
-        body.light-mode .comment-input:focus,
         body.light-mode .edit-post-textarea:focus {
             background: var(--input-focus-bg);
             border-color: var(--primary);
         }
-        body.light-mode .create-post-card,
+        body.light-mode .create-post-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            border-color: rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+        }
+        body.light-mode .create-post-card:focus-within {
+            border-color: var(--border-glow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 0 20px rgba(0, 168, 132, 0.03);
+        }
         body.light-mode .post-card {
             background: rgba(255, 255, 255, 0.9);
             border-color: rgba(0, 0, 0, 0.06);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
         }
+        body.light-mode .post-card:hover {
+            border-color: rgba(0, 168, 132, 0.2);
+        }
         body.light-mode .post-card.pinned {
             border-color: var(--primary) !important;
+            box-shadow: 0 0 25px rgba(0, 168, 132, 0.15);
         }
-        body.light-mode .post-content,
-        body.light-mode .author-meta .post-author {
+        body.light-mode .post-content {
             color: #0f1824;
-        }
-        body.light-mode .post-time {
-            color: #7a8aa0;
-        }
-        body.light-mode .action-btn,
-        body.light-mode .action-panel-btn,
-        body.light-mode .reaction-panel-btn,
-        body.light-mode .menu-trigger-btn {
-            border-color: rgba(0, 0, 0, 0.06);
-            color: var(--text-muted);
-        }
-        body.light-mode .action-btn:hover,
-        body.light-mode .action-panel-btn:hover,
-        body.light-mode .reaction-panel-btn:hover,
-        body.light-mode .menu-trigger-btn:hover {
-            background: rgba(0, 0, 0, 0.04);
-            color: var(--text-main);
-        }
-        body.light-mode .post-menu-modal,
-        body.light-mode .post-menu-item {
-            color: #0f1824;
-        }
-        body.light-mode .post-menu-item:hover {
-            background: rgba(0, 0, 0, 0.03);
-        }
-        body.light-mode .post-menu-item.danger:hover {
-            background: rgba(244, 63, 94, 0.08);
         }
         body.light-mode .comment-item {
             background: rgba(0, 0, 0, 0.02);
             border-color: rgba(0, 0, 0, 0.06);
+        }
+        body.light-mode .action-btn {
+            border-color: rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+        }
+        body.light-mode .action-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+        body.light-mode .action-panel-btn {
+            border-color: rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+        }
+        body.light-mode .action-panel-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+        body.light-mode .reaction-panel-btn {
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+        body.light-mode .reaction-panel-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        body.light-mode .post-dropdown-menu {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-mode .dropdown-item {
+            color: #0f1824;
+        }
+        body.light-mode .dropdown-item:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        body.light-mode .dropdown-item.danger {
+            color: var(--error);
         }
         body.light-mode .image-upload-btn,
         body.light-mode .video-upload-btn {
@@ -154,6 +194,34 @@
         body.light-mode .video-upload-btn:hover {
             background: rgba(0, 0, 0, 0.04);
             color: var(--text-main);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+        body.light-mode .author-meta .post-author {
+            color: #0f1824;
+        }
+        body.light-mode .post-time {
+            color: #7a8aa0;
+        }
+        body.light-mode .menu-trigger-btn {
+            border-color: rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+        }
+        body.light-mode .menu-trigger-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+        body.light-mode .post-menu-modal {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+        body.light-mode .post-menu-item:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+        body.light-mode .post-menu-item.danger:hover {
+            background: rgba(244, 63, 94, 0.08);
+        }
+        body.light-mode .post-menu-header .title {
+            color: #0f1824;
         }
 
         /* ============================================================
@@ -212,7 +280,7 @@
         .feed-header {
             width: 100%;
             max-width: 800px;
-            padding: clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px);
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -225,28 +293,26 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            gap: 6px;
-            min-height: 56px;
+            gap: 8px;
         }
 
         .logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-decoration: none;
             cursor: pointer;
             font-family: var(--font-main);
-            flex-shrink: 0;
         }
 
         .logo-icon {
-            font-size: clamp(24px, 4vw, 34px);
+            font-size: clamp(28px, 4.5vw, 40px);
             line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: clamp(24px, 4vw, 34px);
-            height: clamp(24px, 4vw, 34px);
+            width: clamp(28px, 4.5vw, 40px);
+            height: clamp(28px, 4.5vw, 40px);
             background: linear-gradient(135deg, var(--primary), #00c29a);
             border-radius: 10px;
             color: white;
@@ -256,7 +322,7 @@
         }
 
         .logo-text {
-            font-size: clamp(1.1rem, 4.5vw, 1.8rem);
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
             font-weight: 900;
             letter-spacing: -0.5px;
             background: linear-gradient(135deg, var(--text-main) 20%, var(--primary) 80%);
@@ -266,88 +332,81 @@
             line-height: 1;
         }
 
-        /* ---- Header right group ---- */
+        /* ===== Header Right (new) ===== */
         .header-right {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: clamp(4px, 1.5vw, 8px);
             flex-shrink: 0;
         }
 
-        /* ---- Header icon buttons ---- */
-        .header-icon-btn {
+        .header-btn {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            border-radius: 40px;
             color: var(--text-muted);
-            cursor: pointer;
-            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
-            padding: 4px 8px;
-            min-height: 40px;
-            min-width: 40px;
+            width: clamp(36px, 9vw, 40px);
+            height: clamp(36px, 9vw, 40px);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            font-size: clamp(1rem, 2.8vw, 1.2rem);
+            cursor: pointer;
             transition: var(--transition);
             touch-action: manipulation;
-            gap: 4px;
+            min-width: 36px;
+            min-height: 36px;
+            position: relative;
         }
-        .header-icon-btn:active {
-            transform: scale(0.94);
-        }
-        .header-icon-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text-main);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
+        .header-btn:active { transform: scale(0.9); }
+        .header-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
 
-        .header-icon-btn .badge {
+        .header-btn .badge-count {
             position: absolute;
-            top: -2px;
-            right: -2px;
+            top: -4px;
+            right: -4px;
             background: var(--error);
             color: #fff;
             font-size: 0.55rem;
-            font-weight: 700;
+            font-weight: 800;
             min-width: 18px;
             height: 18px;
-            border-radius: 20px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 4px;
+            box-shadow: 0 0 12px var(--error-glow);
             border: 2px solid var(--bg-deep);
-            line-height: 1;
-        }
-        body.light-mode .header-icon-btn .badge {
-            border-color: #ffffff;
         }
 
-        .header-icon-btn .avatar-small {
-            width: 28px;
-            height: 28px;
+        .avatar-btn {
+            width: clamp(36px, 9vw, 40px);
+            height: clamp(36px, 9vw, 40px);
             border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #00796b, var(--primary));
+            background: linear-gradient(135deg, var(--primary), #005c4b);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
             font-weight: 700;
-            color: white;
+            color: #fff;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            min-width: 36px;
+            min-height: 36px;
         }
-        .header-icon-btn .avatar-small img {
+        .avatar-btn img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* ---- Premium toggle (Menu) ---- */
+        /* ===== Premium Toggle (Menu) ===== */
         .premium-toggle-wrapper {
             position: relative;
-            flex-shrink: 0;
         }
 
         .premium-toggle-btn {
@@ -357,18 +416,17 @@
             padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 14px);
             color: var(--text-main);
             font-family: var(--font-main);
-            font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+            font-size: clamp(0.7rem, 2vw, 0.82rem);
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             min-height: 40px;
             touch-action: manipulation;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            white-space: nowrap;
         }
         .premium-toggle-btn:active {
             transform: scale(0.95);
@@ -398,10 +456,9 @@
             }
         }
 
-        /* ---- Premium dropdown ---- */
         .premium-dropdown {
             position: absolute;
-            top: calc(100% + 6px);
+            top: calc(100% + 8px);
             right: 0;
             background: var(--bg-glass);
             backdrop-filter: blur(24px);
@@ -1101,7 +1158,7 @@
             font-weight: 600;
         }
 
-        /* ----- Email & URL link styling ----- */
+        /* ----- NEW: Email & URL link styling ----- */
         .post-content .email-link {
             color: #ff6b9d;
             background: linear-gradient(135deg, #ff6b9d, #ffa07a);
@@ -1117,19 +1174,16 @@
         .post-content .email-link:hover {
             text-shadow: 0 0 25px rgba(255, 107, 157, 0.8);
         }
-
         .post-content .url-link {
             color: var(--primary);
             text-decoration: underline;
             cursor: pointer;
-            font-weight: 600;
-            transition: color 0.2s;
+            font-weight: 500;
         }
         .post-content .url-link:hover {
             color: var(--primary-hover);
-            text-decoration: none;
         }
-        /* ----- end ----- */
+        /* ----- end new ----- */
 
         .post-image-wrapper {
             width: 100%;
@@ -2793,48 +2847,32 @@
            ============================================================ */
         @media (max-width: 480px) {
             .feed-header {
-                padding: 6px 10px;
+                padding: 8px 12px;
                 flex-wrap: nowrap;
                 gap: 4px;
             }
-            .header-icon-btn {
-                min-height: 36px;
-                min-width: 36px;
+            .header-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                min-width: 32px;
+                min-height: 32px;
+            }
+            .avatar-btn {
+                width: 32px;
+                height: 32px;
                 font-size: 0.8rem;
-                padding: 2px 4px;
-            }
-            .header-icon-btn .badge {
-                min-width: 14px;
-                height: 14px;
-                font-size: 0.45rem;
-                top: -3px;
-                right: -3px;
-            }
-            .header-icon-btn .avatar-small {
-                width: 22px;
-                height: 22px;
-                font-size: 0.55rem;
+                min-width: 32px;
+                min-height: 32px;
             }
             .premium-toggle-btn {
                 font-size: 0.6rem;
-                padding: 2px 6px;
-                min-height: 34px;
-            }
-            .premium-toggle-btn .badge-dot {
-                width: 4px;
-                height: 4px;
-            }
-            .logo-icon {
-                width: 28px;
-                height: 28px;
-                font-size: 20px;
-            }
-            .logo-text {
-                font-size: 1rem;
+                padding: 4px 8px;
+                min-height: 32px;
             }
             .premium-dropdown {
                 right: -10px;
-                min-width: 170px;
+                min-width: 180px;
             }
             .post-card {
                 padding: 14px;
@@ -2912,39 +2950,10 @@
             .post-menu-item,
             .post-menu-close,
             .reaction-panel-btn,
-            .header-icon-btn {
+            .header-btn,
+            .avatar-btn {
                 min-height: 44px;
                 min-width: 44px;
-            }
-            .header-icon-btn {
-                min-height: 40px;
-                min-width: 40px;
-            }
-        }
-        @media (max-width: 374px) {
-            .header-icon-btn .badge {
-                min-width: 12px;
-                height: 12px;
-                font-size: 0.4rem;
-                top: -4px;
-                right: -4px;
-            }
-            .header-icon-btn .avatar-small {
-                width: 18px;
-                height: 18px;
-            }
-            .logo-icon {
-                width: 24px;
-                height: 24px;
-                font-size: 16px;
-            }
-            .logo-text {
-                font-size: 0.85rem;
-            }
-            .premium-toggle-btn {
-                font-size: 0.5rem;
-                padding: 2px 4px;
-                min-height: 30px;
             }
         }
     </style>
@@ -2959,18 +2968,16 @@
         </a>
 
         <div class="header-right">
-            <!-- Notification button -->
-            <button class="header-icon-btn" onclick="goToNotifications()" title="Notifications" aria-label="Notifications">
+            <!-- Notifications Button -->
+            <button class="header-btn" id="notifHeaderBtn" onclick="window.location.href='notifications.html'" title="Notifications">
                 🔔
-                <span class="badge" id="headerNotifBadge" style="display:none;">0</span>
+                <span class="badge-count" id="headerNotifBadge" style="display:none;">0</span>
             </button>
 
-            <!-- Profile button -->
-            <button class="header-icon-btn" onclick="goToProfile()" title="Profile" aria-label="Profile">
-                <span class="avatar-small" id="headerAvatar">👤</span>
-            </button>
+            <!-- Profile Avatar -->
+            <button class="avatar-btn" id="headerProfileBtn" onclick="window.location.href='profile.html'">👤</button>
 
-            <!-- Menu toggle -->
+            <!-- Menu Toggle -->
             <div class="premium-toggle-wrapper">
                 <button class="premium-toggle-btn" id="premiumToggleBtn" onclick="togglePremiumMenu()">
                     <span class="menu-icon">✦</span>
@@ -2986,12 +2993,10 @@
                         <button class="dropdown-item" onclick="navigateTo('community')"><span class="icon">👨‍👩‍👧‍👦</span> Community</button>
                         <button class="dropdown-item" onclick="navigateTo('rooms')"><span class="icon">💞</span> Fun Rooms <span class="badge primary">Live</span></button>
                         <button class="dropdown-item" onclick="navigateTo('messages')"><span class="icon">💬</span> Messages <span class="badge danger" id="dropdownChatBadge" style="display:none;">0</span></button>
-                        <!-- Notifications removed from dropdown — now in header -->
                     </div>
                     <div class="dropdown-section">
                         <div class="dropdown-label">Account</div>
                         <button class="dropdown-item admin-heart" id="dropdownAdminBtn" onclick="navigateTo('admin')"><span class="icon">⚙️</span> Admin Panel <span class="badge danger">★</span></button>
-                        <!-- Profile removed from dropdown — now in header -->
                     </div>
                 </div>
 
@@ -3190,7 +3195,9 @@
                 mutedWordsKey: 'spikeMutedWords',
                 blockedUsersKey: 'spikeBlockedUsers',
                 feedCacheKey: 'feed_cache_v3',
-                maintenanceKey: 'spikeMaintenance'
+                maintenanceKey: 'spikeMaintenance',
+                notifCacheKey: 'spike_notifications_cache',
+                notifReadKey: 'spike_read_notifications'
             }
         };
 
@@ -3337,13 +3344,24 @@
                     data)); } catch (e) {} }
 
         function updateDropdownAvatar(avatarUrl) {
-            const container = document.getElementById('dropdownAvatar');
-            if (!container) return;
-            if (avatarUrl && avatarUrl.trim() !== '') {
-                container.innerHTML =
-                    `<img src="${avatarUrl}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            } else {
-                container.textContent = '👤';
+            // Update dropdown avatar (if present)
+            const dropdownAvatar = document.getElementById('dropdownAvatar');
+            if (dropdownAvatar) {
+                if (avatarUrl && avatarUrl.trim() !== '') {
+                    dropdownAvatar.innerHTML =
+                        `<img src="${avatarUrl}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                } else {
+                    dropdownAvatar.textContent = '👤';
+                }
+            }
+            // Update header profile avatar
+            const headerProfile = document.getElementById('headerProfileBtn');
+            if (headerProfile) {
+                if (avatarUrl && avatarUrl.trim() !== '') {
+                    headerProfile.innerHTML = `<img src="${avatarUrl}" alt="Profile">`;
+                } else {
+                    headerProfile.textContent = '👤';
+                }
             }
         }
 
@@ -3397,27 +3415,13 @@
                     if (avatar) setCachedAvatar(uid, avatar);
                     setCachedUser(uid, { ...data, avatar, name, suspended });
                     onlineStatusCache.set(uid, onlineStatus);
-                    if (uid === currentUser?.uid) {
-                        updateDropdownAvatar(avatar);
-                        updateHeaderAvatar(avatar);
-                    }
+                    if (uid === currentUser?.uid) updateDropdownAvatar(avatar);
                     updateOnlineStatusDots(uid, onlineStatus);
                     updateUserDisplayInFeed(uid, { name, avatar, suspended });
                 }
             }, (error) => console.error("Avatar listener error:", error));
             avatarListeners.set(uid, unsubscribe);
             listenToOnlineStatus(uid);
-        }
-
-        function updateHeaderAvatar(avatarUrl) {
-            const container = document.getElementById('headerAvatar');
-            if (!container) return;
-            if (avatarUrl && avatarUrl.trim() !== '') {
-                container.innerHTML =
-                    `<img src="${avatarUrl}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-            } else {
-                container.textContent = '👤';
-            }
         }
 
         function updateUserDisplayInFeed(uid, data) {
@@ -3464,6 +3468,38 @@
         }
 
         // ============================================================
+        // NOTIFICATION BADGE
+        // ============================================================
+        function updateNotificationBadge() {
+            const badge = document.getElementById('headerNotifBadge');
+            if (!badge) return;
+            try {
+                const cached = localStorage.getItem(CONFIG.storage.notifCacheKey);
+                const readStr = localStorage.getItem(CONFIG.storage.notifReadKey);
+                let notifs = [];
+                let readSet = new Set();
+                if (cached) { const parsed = JSON.parse(cached); if (Array.isArray(parsed)) notifs = parsed; }
+                if (readStr) { const parsed = JSON.parse(readStr); if (Array.isArray(parsed)) readSet = new Set(parsed); }
+                const unread = notifs.filter(n => !readSet.has(n.id)).length;
+                if (unread > 0) {
+                    badge.textContent = unread > 99 ? '99+' : unread;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Listen for storage changes (from notifications page)
+        window.addEventListener('storage', (e) => {
+            if (e.key === CONFIG.storage.notifCacheKey || e.key === CONFIG.storage.notifReadKey) {
+                updateNotificationBadge();
+            }
+        });
+
+        // ============================================================
         // UPDATED parsePostContent — detects emails & URLs
         // ============================================================
         function parsePostContent(text) {
@@ -3471,18 +3507,12 @@
             // Escape HTML first to prevent injection
             let html = escapeHTML(text);
 
-            // Convert URLs (http/https) to clickable links with target="_blank"
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            // Convert URLs (http/https/www) to clickable links
+            const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
             html = html.replace(urlRegex, function(match) {
-                return `<a href="${match}" target="_blank" rel="noopener noreferrer" class="url-link">${match}</a>`;
-            });
-
-            // Also handle www. without protocol
-            const wwwRegex = /(?:^|\s)(www\.[^\s]+)/g;
-            html = html.replace(wwwRegex, function(match) {
-                const trimmed = match.trim();
-                const href = 'http://' + trimmed;
-                return ` <a href="${href}" target="_blank" rel="noopener noreferrer" class="url-link">${trimmed}</a>`;
+                let href = match;
+                if (!href.startsWith('http')) href = 'http://' + href;
+                return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="url-link">${match}</a>`;
             });
 
             // Convert email addresses to mailto links (pink/orange glowing)
@@ -3795,10 +3825,6 @@
             const isHidden = post.hidden === true;
             const isPinned = post.pinned === true;
 
-            // ===== CHECK IF POST AUTHOR IS ADMIN =====
-            const authorUserData = getCachedUser(post.authorUid);
-            const isAuthorAdmin = authorUserData && CONFIG.admin.emails.includes(authorUserData.email?.toLowerCase());
-
             const userData = getCachedUser(post.authorUid) || { name: post.authorName || 'User', avatar: '' };
             const authorName = userData.name || post.authorName || 'User';
             const timeAgo = formatTimeAgo(post.createdAt);
@@ -3859,14 +3885,8 @@
                         `;
             }
 
-            // ===== REPORT BUTTON: HIDE FOR ADMIN POSTS (regular users can't report admin) =====
-            // Show report button only if:
-            // 1. User is not the owner
-            // 2. User is admin (for moderation) OR the post author is NOT admin
-            const showReportButton = !isOwner && (isAdmin || !isAuthorAdmin);
-
             let reportButtonHTML = "";
-            if (showReportButton) {
+            if (!isOwner && !isAdmin) {
                 reportButtonHTML =
                     `<button class="menu-trigger-btn" onclick="window.openReportModal('${postId}')" title="Report Post" style="font-size:0.8rem;">🚩</button>`;
             }
@@ -3941,9 +3961,6 @@
             const likes = post.likes || [];
             const isLiked = currentUser && likes.includes(currentUser.uid);
 
-            // ===== Action panel: hide Report button for admin posts =====
-            const showReportInPanel = !isOwner && (isAdmin || !isAuthorAdmin);
-
             return `
                         <div class="post-card ${pinnedClass}" id="post-card-${postId}">
                             <div class="post-header">
@@ -3988,7 +4005,7 @@
                                     <button class="action-panel-btn" onclick="document.getElementById('comments-section-${postId}').classList.toggle('active')">💬 Comment</button>
                                     <button class="action-panel-btn primary" onclick="window.openRepostModal('${postId}')">🔁 Repost</button>
                                     <button class="action-panel-btn primary" onclick="window.openShareModal('${postId}')">🔗 Share</button>
-                                    ${showReportInPanel ? `<button class="action-panel-btn" onclick="window.openReportModal('${postId}')" style="color:var(--error);">🚩 Report</button>` : ''}
+                                    ${!isOwner && !isAdmin ? `<button class="action-panel-btn" onclick="window.openReportModal('${postId}')" style="color:var(--error);">🚩 Report</button>` : ''}
                                 </div>
                             </div>
 
@@ -4721,15 +4738,13 @@
         }
 
         // ============================================================
-        // CHAT BADGE & NOTIFICATION BADGE
+        // CHAT BADGE
         // ============================================================
         function initBadges() {
             if (!currentUser) return;
-
-            // Chat badge (dropdown)
             if (chatBadgeUnsubscribe) chatBadgeUnsubscribe();
-            const chatQ = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-            chatBadgeUnsubscribe = onSnapshot(chatQ, (snapshot) => {
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+            chatBadgeUnsubscribe = onSnapshot(q, (snapshot) => {
                 let unreadCount = 0;
                 snapshot.docs.forEach(docSnap => {
                     const data = docSnap.data();
@@ -4745,24 +4760,8 @@
                     }
                 }
             });
-
-            // Notification badge (header)
-            const notifQ = query(collection(db, "users", currentUser.uid, "notifications"), where("read", "==", false));
-            const notifUnsub = onSnapshot(notifQ, (snapshot) => {
-                const unreadCount = snapshot.size;
-                const badge = document.getElementById("headerNotifBadge");
-                if (badge) {
-                    if (unreadCount > 0) {
-                        badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }
-            }, (error) => console.error("Notification badge error:", error));
-
-            // Store unsubscribe for cleanup
-            window._notifBadgeUnsub = notifUnsub;
+            // Update notification badge on load
+            updateNotificationBadge();
         }
 
         // ============================================================
@@ -4776,10 +4775,7 @@
                 if (adminBtn) adminBtn.classList.toggle("visible", isAdmin);
 
                 const cachedAvatar = getCachedAvatar(user.uid);
-                if (cachedAvatar) {
-                    updateDropdownAvatar(cachedAvatar);
-                    updateHeaderAvatar(cachedAvatar);
-                }
+                if (cachedAvatar) updateDropdownAvatar(cachedAvatar);
                 listenForAvatarUpdates(user.uid);
                 listenToOnlineStatus(user.uid);
 
@@ -4809,17 +4805,17 @@
             } else {
                 isAdmin = false;
                 updateDropdownAvatar(null);
-                updateHeaderAvatar(null);
                 cleanupOnlineStatusListeners();
                 if (announcementUnsubscribe) { announcementUnsubscribe();
                     announcementUnsubscribe = null; }
-                if (window._notifBadgeUnsub) { window._notifBadgeUnsub();
-                    window._notifBadgeUnsub = null; }
                 const postsStream = document.getElementById("postsStream");
                 if (postsStream) postsStream.innerHTML =
                     `<div class="empty-state"><span class="icon">🔒</span>Please sign in to view the feed.</div>`;
                 const container = document.getElementById('announcementContainer');
                 if (container) container.innerHTML = '';
+                // Hide notification badge
+                const badge = document.getElementById('headerNotifBadge');
+                if (badge) badge.style.display = 'none';
             }
         });
 
@@ -4835,7 +4831,7 @@
             }
         });
 
-        window.addEventListener('storage', () => {
+        window.addEventListener('storage', (e) => {
             applySettings();
             const data = localStorage.getItem(CONFIG.storage.maintenanceKey);
             if (data) { try { const parsed = JSON.parse(data); if (parsed.active === true && !window.location.pathname
@@ -4843,6 +4839,10 @@
                     e) {} }
             const annData = loadAnnouncement();
             renderAnnouncement(annData);
+            // Update notification badge on storage changes from notifications page
+            if (e.key === CONFIG.storage.notifCacheKey || e.key === CONFIG.storage.notifReadKey) {
+                updateNotificationBadge();
+            }
         });
 
         // ============================================================
@@ -4853,8 +4853,6 @@
         renderAnnouncement(initialAnn);
 
         console.log('📱 Feed initialized — all features ready');
-        console.log('🔒 Report button hidden for admin posts (regular users)');
-        console.log('🔗 URLs open in default browser (target="_blank")');
         console.log('🔔 Notifications & Profile moved to header');
     </script>
 </body>

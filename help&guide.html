@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Help & Guide — SPIKE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================================
+           VARIABLES & THEMES
+           ============================================================ */
+        :root {
+            --bg-deep: #070b10;
+            --bg-surface: #0d1520;
+            --bg-card: rgba(20, 32, 48, 0.7);
+            --bg-glass: rgba(13, 21, 32, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 168, 132, 0.3);
+            --primary: #00a884;
+            --primary-hover: #00c29a;
+            --primary-glow: rgba(0, 168, 132, 0.4);
+            --accent: #0ea5e9;
+            --error: #f43f5e;
+            --error-glow: rgba(244, 63, 94, 0.4);
+            --success: #00a884;
+            --success-glow: rgba(0, 168, 132, 0.4);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.4);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --gold: #ffd700;
+            --premium: #7c3aed;
+            --elite: #f97316;
+        }
+
+        body.light-mode {
+            --bg-deep: #f0f4fa;
+            --bg-surface: #e8edf4;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-glass: rgba(255, 255, 255, 0.92);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-main: #0f1824;
+            --text-muted: #5a6e8a;
+            --border-glow: rgba(0, 168, 132, 0.2);
+        }
+
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100%; min-height: 100vh; overflow-x: hidden; background-color: var(--bg-deep); color: var(--text-main); font-family: var(--font-main); }
+        body { display: flex; flex-direction: column; align-items: center; position: relative; }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(0,168,132,0.03) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(14,165,233,0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .help-header {
+            width: 100%; max-width: 800px; padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-glass); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            gap: 12px;
+            min-height: 64px;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+
+        .back-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: clamp(0.8rem, 2vw, 0.85rem);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 10px;
+            transition: var(--transition);
+            font-family: var(--font-main);
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+        }
+        .back-btn:active { transform: scale(0.95); }
+        .back-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-main); border-color: rgba(255,255,255,0.15); }
+
+        .logo {
+            font-size: clamp(1rem, 3.5vw, 1.3rem);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: clamp(1rem, 3vw, 1.15rem);
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+        }
+        .header-nav-link:active { transform: scale(0.92); }
+        .header-nav-link:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .help-main {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            padding: clamp(16px, 4vw, 24px) 16px;
+            width: 100%; max-width: 800px; margin: auto;
+            gap: clamp(16px, 3vw, 24px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .help-hero {
+            text-align: center;
+            padding: 20px 0 12px;
+            width: 100%;
+        }
+        .help-hero .hero-icon {
+            font-size: clamp(3rem, 10vw, 4.5rem);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .help-hero h1 {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .help-hero p {
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+            color: var(--text-muted);
+            margin-top: 4px;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ============================================================
+           SEARCH
+           ============================================================ */
+        .help-search {
+            width: 100%;
+            max-width: 560px;
+            position: relative;
+        }
+        .help-search input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 60px;
+            color: var(--text-main);
+            font-family: var(--font-main);
+            font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+            outline: none;
+            transition: var(--transition);
+            min-height: 48px;
+        }
+        .help-search input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,168,132,0.12);
+            background: rgba(7,11,16,0.85);
+        }
+        .help-search input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+        .help-search .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        .help-search .clear-search {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+            padding: 4px;
+            touch-action: manipulation;
+        }
+        .help-search .clear-search.active { display: block; }
+
+        /* ============================================================
+           TABLE OF CONTENTS
+           ============================================================ */
+        .toc-container {
+            width: 100%;
+            max-width: 560px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: clamp(14px, 3vw, 18px) clamp(16px, 4vw, 20px);
+        }
+        .toc-title {
+            font-size: clamp(0.7rem, 1.8vw, 0.78rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            opacity: 0.5;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 12px;
+        }
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: clamp(0.7rem, 1.8vw, 0.78rem);
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: var(--font-main);
+            text-align: left;
+            touch-action: manipulation;
+        }
+        .toc-item:hover {
+            color: var(--text-main);
+        }
+        .toc-item .toc-icon { font-size: 0.8rem; width: 20px; text-align: center; flex-shrink: 0; }
+        .toc-item .toc-label { flex: 1; }
+
+        @media (max-width: 480px) {
+            .toc-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ============================================================
+           GUIDE SECTIONS
+           ============================================================ */
+        .guide-section {
+            width: 100%;
+            max-width: 560px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: clamp(16px, 3vw, 20px);
+            transition: var(--transition);
+            scroll-margin-top: 80px;
+        }
+        .guide-section:hover {
+            border-color: rgba(255,255,255,0.08);
+        }
+        .guide-section .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .guide-section .section-header .sec-icon {
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
+            flex-shrink: 0;
+        }
+        .guide-section .section-header .sec-title {
+            font-size: clamp(0.95rem, 2.8vw, 1.05rem);
+            font-weight: 700;
+            color: var(--text-main);
+            flex: 1;
+        }
+        .guide-section .section-header .sec-toggle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+            opacity: 0.4;
+            flex-shrink: 0;
+        }
+        .guide-section .section-header .sec-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .guide-section .section-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .guide-section .section-body.hidden {
+            display: none;
+        }
+
+        .guide-item {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+            border-left: 3px solid var(--primary);
+            transition: var(--transition);
+        }
+        .guide-item:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .guide-item .item-title {
+            font-size: clamp(0.82rem, 2.2vw, 0.88rem);
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .guide-item .item-title .item-icon {
+            font-size: 0.9rem;
+        }
+        .guide-item .item-desc {
+            font-size: clamp(0.72rem, 2vw, 0.78rem);
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-top: 2px;
+            padding-left: 4px;
+        }
+        .guide-item .item-desc a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .guide-item .item-desc a:hover {
+            text-decoration: underline;
+        }
+        .guide-item .item-desc .highlight {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .guide-item .item-desc .tag {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            background: rgba(0,168,132,0.12);
+            color: var(--primary);
+            margin: 0 2px;
+        }
+        .guide-item .item-desc .tag.warning {
+            background: rgba(245,158,11,0.12);
+            color: var(--warning);
+        }
+        .guide-item .item-desc .tag.error {
+            background: rgba(244,63,94,0.12);
+            color: var(--error);
+        }
+        .guide-item .item-desc .tag.gold {
+            background: rgba(255,215,0,0.12);
+            color: var(--gold);
+        }
+        .guide-item .item-desc .tag.premium {
+            background: rgba(124,58,237,0.12);
+            color: var(--premium);
+        }
+        .guide-item .item-desc .tag.elite {
+            background: rgba(249,115,22,0.12);
+            color: var(--elite);
+        }
+
+        .guide-item .item-steps {
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+        .guide-item .item-steps .step {
+            font-size: clamp(0.68rem, 1.8vw, 0.74rem);
+            color: var(--text-muted);
+            padding: 2px 0 2px 20px;
+            position: relative;
+            line-height: 1.4;
+        }
+        .guide-item .item-steps .step::before {
+            content: '•';
+            position: absolute;
+            left: 4px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .guide-item .item-steps .step .step-num {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .guide-item .item-requirements {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .guide-item .item-requirements .req-badge {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2px 12px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .guide-item .item-requirements .req-badge .req-icon {
+            font-size: 0.7rem;
+        }
+
+        .guide-progress-demo {
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0 2px;
+        }
+        .guide-progress-demo .progress-track {
+            height: 4px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 4px 0;
+        }
+        .guide-progress-demo .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--gold), #f59e0b);
+            width: 45%;
+        }
+        .guide-progress-demo .progress-stats {
+            display: flex;
+            gap: 10px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+        .guide-progress-demo .progress-stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .guide-progress-demo .progress-stats .stat .check {
+            color: var(--success);
+        }
+        .guide-progress-demo .progress-stats .stat .cross {
+            color: var(--error);
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .help-footer {
+            width: 100%; max-width: 800px;
+            padding: clamp(10px, 2.5vw, 14px) clamp(16px, 3vw, 24px);
+            text-align: center; font-size: clamp(0.65rem, 2vw, 0.75rem);
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0; background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            margin-top: 8px;
+        }
+        .help-footer .footer-heart {
+            color: var(--error);
+            display: inline-block;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            14% { transform: scale(1.2); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.15); }
+            70% { transform: scale(1); }
+        }
+
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast-container {
+            position: fixed; top: 28px; left: 50%;
+            transform: translateX(-50%) translateY(-30px); z-index: 9999;
+            width: calc(100% - 32px); max-width: 420px;
+            opacity: 0; visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .toast-container.active {
+            opacity: 1; visibility: visible;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast-content {
+            background: var(--bg-glass); backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: clamp(10px, 2.5vw, 14px) clamp(14px, 4vw, 18px);
+            display: flex; align-items: center; gap: clamp(8px, 2.5vw, 14px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            position: relative; overflow: hidden;
+            animation: toastSlideIn 0.5s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes toastSlideIn {
+            0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastSlideOut {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-16px) scale(0.95); }
+        }
+        .toast-container.removing .toast-content { animation: toastSlideOut 0.35s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+        .toast-icon-wrapper {
+            width: clamp(32px, 8vw, 38px); height: clamp(32px, 8vw, 38px);
+            min-width: clamp(32px, 8vw, 38px); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-weight: 800; flex-shrink: 0;
+            position: relative;
+        }
+        .toast-icon-wrapper::before {
+            content: ''; position: absolute; inset: -2px; border-radius: 14px;
+            background: var(--toast-glow-color); opacity: 0.12; filter: blur(6px);
+        }
+        .toast-icon-wrapper .icon { position: relative; z-index: 1; }
+
+        .toast-container.success { --toast-glow-color: rgba(0,168,132,0.5); }
+        .toast-container.success .toast-icon-wrapper {
+            background: rgba(0,168,132,0.12);
+            border: 1px solid rgba(0,168,132,0.25);
+            color: var(--success);
+        }
+        .toast-container.error { --toast-glow-color: rgba(244,63,94,0.5); }
+        .toast-container.error .toast-icon-wrapper {
+            background: rgba(244,63,94,0.12);
+            border: 1px solid rgba(244,63,94,0.25);
+            color: var(--error);
+        }
+        .toast-container.warning { --toast-glow-color: rgba(245,158,11,0.5); }
+        .toast-container.warning .toast-icon-wrapper {
+            background: rgba(245,158,11,0.12);
+            border: 1px solid rgba(245,158,11,0.25);
+            color: var(--warning);
+        }
+
+        .toast-text-group { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+        .toast-title { font-size: clamp(0.7rem, 2.2vw, 0.8rem); font-weight: 800; color: var(--text-main); line-height: 1.2; }
+        .toast-message { font-size: clamp(0.65rem, 2vw, 0.72rem); font-weight: 500; color: var(--text-muted); line-height: 1.3; }
+        .toast-close-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: clamp(22px, 5vw, 26px);
+            height: clamp(22px, 5vw, 26px);
+            min-width: clamp(22px, 5vw, 26px);
+            border-radius: 50%;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 0.6rem; transition: var(--transition);
+            flex-shrink: 0; touch-action: manipulation;
+        }
+        .toast-close-btn:active { transform: scale(0.9); }
+        .toast-close-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 2px;
+            background: var(--toast-glow-color); border-radius: 0 0 16px 16px;
+            width: 100%; animation: toastProgress 3s linear forwards;
+        }
+        @keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 480px) {
+            .help-header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+            .help-main { padding: 16px 10px; }
+            .guide-section { padding: 14px; }
+            .guide-item { padding: 6px 10px; }
+            .toc-container { padding: 12px 14px; }
+            .back-btn { font-size: 0.7rem; padding: 4px 10px; }
+            .help-search input { font-size: 0.8rem; padding: 10px 14px 10px 38px; min-height: 40px; }
+            .help-search .search-icon { left: 12px; font-size: 0.9rem; }
+        }
+
+        @media (max-width: 380px) {
+            .guide-section { padding: 10px; }
+            .guide-item { padding: 4px 8px; }
+            .toc-grid { grid-template-columns: 1fr; }
+            .help-search input { font-size: 0.75rem; padding: 8px 12px 8px 34px; min-height: 36px; }
+        }
+
+        @media (pointer: coarse) {
+            .back-btn, .header-nav-link, .toc-item,
+            .toast-close-btn, .guide-section .section-header {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .toc-item { min-height: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    HEADER
+    ============================================================ -->
+    <header class="help-header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <a href="feed.html" class="logo">SPIKE</a>
+        </div>
+        <div class="header-right">
+            <a href="profile.html" class="header-nav-link" title="Profile">👤</a>
+        </div>
+    </header>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="help-main">
+
+        <!-- ===== HERO ===== -->
+        <div class="help-hero">
+            <span class="hero-icon">📖</span>
+            <h1>SPIKE Help &amp; Guide</h1>
+            <p>Everything you need to know about using SPIKE — from getting started to advanced features.</p>
+        </div>
+
+        <!-- ===== SEARCH ===== -->
+        <div class="help-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search for help topics..." oninput="handleSearch(this.value)">
+            <button class="clear-search" id="clearSearch" onclick="clearSearch()">✕</button>
+        </div>
+
+        <!-- ===== TABLE OF CONTENTS ===== -->
+        <div class="toc-container" id="tocContainer">
+            <div class="toc-title">📋 Table of Contents</div>
+            <div class="toc-grid" id="tocGrid">
+                <button class="toc-item" onclick="scrollToSection('sec-getting-started')">
+                    <span class="toc-icon">🚀</span>
+                    <span class="toc-label">Getting Started</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-profile')">
+                    <span class="toc-icon">👤</span>
+                    <span class="toc-label">Profile &amp; Identity</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-verification')">
+                    <span class="toc-icon">✅</span>
+                    <span class="toc-label">Verification Badge</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-posts')">
+                    <span class="toc-icon">📝</span>
+                    <span class="toc-label">Posts &amp; Content</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-connections')">
+                    <span class="toc-icon">🤝</span>
+                    <span class="toc-label">Connections</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-messaging')">
+                    <span class="toc-icon">💬</span>
+                    <span class="toc-label">Messaging &amp; Calls</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-communities')">
+                    <span class="toc-icon">🏠</span>
+                    <span class="toc-label">Communities</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-coins')">
+                    <span class="toc-icon">🪙</span>
+                    <span class="toc-label">Coins &amp; Shop</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-settings')">
+                    <span class="toc-icon">⚙️</span>
+                    <span class="toc-label">Settings &amp; Privacy</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-safety')">
+                    <span class="toc-icon">🛡️</span>
+                    <span class="toc-label">Safety &amp; Security</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-admin')">
+                    <span class="toc-icon">🛠️</span>
+                    <span class="toc-label">Admin Guide</span>
+                </button>
+                <button class="toc-item" onclick="scrollToSection('sec-faq')">
+                    <span class="toc-icon">❓</span>
+                    <span class="toc-label">FAQ</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: GETTING STARTED
+        ============================================================ -->
+        <div class="guide-section" id="sec-getting-started">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🚀</span>
+                <span class="sec-title">Getting Started</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📱</span> What is SPIKE?</div>
+                    <div class="item-desc">SPIKE is a real‑time social platform where you can connect with friends, share posts, chat, join communities, and build your network. Everything is designed for speed and simplicity.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📝</span> Creating Your Account</div>
+                    <div class="item-desc">Sign up using your email address and a secure password. You'll also need to verify your phone number with a 6‑digit OTP code.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to the signup page</div>
+                        <div class="step"><span class="step-num">2.</span> Enter your name, email, and phone number</div>
+                        <div class="step"><span class="step-num">3.</span> Verify your phone number with the OTP code</div>
+                        <div class="step"><span class="step-num">4.</span> Create a password and submit</div>
+                        <div class="step"><span class="step-num">5.</span> Check your email for verification link</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🆔</span> Your SPIKE ID</div>
+                    <div class="item-desc">Every user gets a <span class="highlight">permanent SPIKE ID</span> (e.g., <span class="highlight">SP-123456</span>) when they sign up. This ID is unique to you and can be used to find and connect with others.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔑</span> Signing In</div>
+                    <div class="item-desc">Use your email and password to sign in. You can also enable <span class="tag">Remember Me</span> to stay logged in across sessions.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to the login page</div>
+                        <div class="step"><span class="step-num">2.</span> Enter your email and password</div>
+                        <div class="step"><span class="step-num">3.</span> Check "Remember Me" to stay signed in</div>
+                        <div class="step"><span class="step-num">4.</span> Click <span class="tag">Sign In</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔐</span> Forgot Password?</div>
+                    <div class="item-desc">If you forget your password, click "Forgot password?" on the login page. Enter your email address and we'll send you a reset link.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: PROFILE & IDENTITY
+        ============================================================ -->
+        <div class="guide-section" id="sec-profile">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">👤</span>
+                <span class="sec-title">Profile &amp; Identity</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📸</span> Setting Up Your Profile</div>
+                    <div class="item-desc">Your profile is your identity on SPIKE. Complete it to help others find and connect with you.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to your <a href="profile.html">Profile</a> page</div>
+                        <div class="step"><span class="step-num">2.</span> Tap the avatar to upload a photo</div>
+                        <div class="step"><span class="step-num">3.</span> Tap the "Data" button to view and edit all your profile fields</div>
+                        <div class="step"><span class="step-num">4.</span> Click <span class="tag">✏️ Edit Profile</span> to make changes</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📋</span> Profile Fields</div>
+                    <div class="item-desc">You can fill in various fields to share more about yourself:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> <strong>Basic:</strong> Name, Username, Bio, Mood</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Personal:</strong> Location, DOB, Gender, Pronouns, Relationship</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Professional:</strong> Occupation, Company, Education, Industry</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Social:</strong> Website, Instagram, Twitter, YouTube, TikTok, GitHub, LinkedIn</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Interests &amp; Skills:</strong> Add multiple tags to showcase your hobbies and talents</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔒</span> Privacy Controls</div>
+                    <div class="item-desc">Each profile field has a privacy setting — <span class="tag">Public</span> or <span class="tag warning">Private</span>.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> <strong>Public:</strong> Visible to everyone on SPIKE</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Private:</strong> Only visible to you</div>
+                        <div class="step"><span class="step-num">•</span> Toggle visibility in the <a href="profile.html">Profile</a> page</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🆔</span> Finding Users by SPIKE ID</div>
+                    <div class="item-desc">You can find other users by their SPIKE ID. Go to <a href="settings.html">Settings</a> → Find Users and enter the SPIKE ID to search.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: VERIFICATION BADGE
+        ============================================================ -->
+        <div class="guide-section" id="sec-verification">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">✅</span>
+                <span class="sec-title">Verification Badge</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">⭐</span> What is the Verification Badge?</div>
+                    <div class="item-desc">The <span class="highlight">Verified Badge</span> is a gold checkmark that appears on your profile. It shows that you are a trusted, genuine member of the SPIKE community.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📊</span> Requirements</div>
+                    <div class="item-desc">To unlock verification, you must meet all three requirements:</div>
+                    <div class="item-requirements">
+                        <span class="req-badge"><span class="req-icon">📅</span> 1 Year Active</span>
+                        <span class="req-badge"><span class="req-icon">👥</span> 500 Friends</span>
+                        <span class="req-badge"><span class="req-icon">📝</span> 1,000 Posts</span>
+                    </div>
+                    <div class="guide-progress-demo">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:45%;"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <span class="stat"><span class="check">✅</span> 292/365 days</span>
+                            <span class="stat"><span class="check">✅</span> 450/500 friends</span>
+                            <span class="stat"><span class="cross">⏳</span> 600/1,000 posts</span>
+                        </div>
+                    </div>
+                    <div class="item-desc">You can track your progress on your <a href="profile.html">Profile</a> page under the verification section.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">💰</span> How to Apply</div>
+                    <div class="item-desc">Once you meet all requirements:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="verify_badge.html">Get Verified</a></div>
+                        <div class="step"><span class="step-num">2.</span> Select your preferred plan (One-Time, Monthly, or Yearly)</div>
+                        <div class="step"><span class="step-num">3.</span> Make a bank transfer to the provided account</div>
+                        <div class="step"><span class="step-num">4.</span> Upload your payment receipt</div>
+                        <div class="step"><span class="step-num">5.</span> Submit for admin approval</div>
+                    </div>
+                    <div class="item-desc">Processing time: <span class="tag gold">10-30 minutes</span></div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">❓</span> What happens after applying?</div>
+                    <div class="item-desc">Your request enters <span class="tag gold">Pending Review</span> status. An admin will review your application and approve or reject it.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">✅</span> <strong>Approved:</strong> You receive the Verified Badge permanently</div>
+                        <div class="step"><span class="step-num">❌</span> <strong>Rejected:</strong> You can reapply after a <span class="tag warning">5-minute cooldown</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: POSTS & CONTENT
+        ============================================================ -->
+        <div class="guide-section" id="sec-posts">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">📝</span>
+                <span class="sec-title">Posts &amp; Content</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">✍️</span> Creating a Post</div>
+                    <div class="item-desc">Share your thoughts with the SPIKE community.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to the <a href="feed.html">Feed</a> page</div>
+                        <div class="step"><span class="step-num">2.</span> Type your message in the "What's happening?" box</div>
+                        <div class="step"><span class="step-num">3.</span> Attach an <span class="tag">📷 Image</span> or <span class="tag">🎥 Video</span> (optional)</div>
+                        <div class="step"><span class="step-num">4.</span> Click <span class="tag">Post</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">❤️</span> Interacting with Posts</div>
+                    <div class="item-desc">You can interact with posts in multiple ways:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">❤️</span> <strong>Like:</strong> Click the heart icon</div>
+                        <div class="step"><span class="step-num">😂😮😢😡</span> <strong>React:</strong> Click the ⋯ button to open reactions</div>
+                        <div class="step"><span class="step-num">💬</span> <strong>Comment:</strong> Click the comment icon and type your reply</div>
+                        <div class="step"><span class="step-num">🔁</span> <strong>Repost:</strong> Share the post to your own feed</div>
+                        <div class="step"><span class="step-num">🔗</span> <strong>Share:</strong> Send the post to a friend via chat</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔧</span> Managing Your Posts</div>
+                    <div class="item-desc">As the author, you can:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">✏️</span> <strong>Edit:</strong> Click the ⋮ menu and select Edit</div>
+                        <div class="step"><span class="step-num">📌</span> <strong>Pin:</strong> Pin the post to the top of your feed (Elite or Mod)</div>
+                        <div class="step"><span class="step-num">🔒</span> <strong>Hide:</strong> Hide the post from public view</div>
+                        <div class="step"><span class="step-num">🗑️</span> <strong>Delete:</strong> Permanently remove the post</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔗</span> Link Previews</div>
+                    <div class="item-desc">When you paste a link into the post composer, SPIKE automatically generates a rich preview with the title, description, and image.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: CONNECTIONS
+        ============================================================ -->
+        <div class="guide-section" id="sec-connections">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🤝</span>
+                <span class="sec-title">Connections</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">👥</span> Friends System</div>
+                    <div class="item-desc">Connect with other SPIKE users by becoming friends.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📩</span> Sending a Friend Request</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="friends.html">Friends</a></div>
+                        <div class="step"><span class="step-num">2.</span> Search for a user by name</div>
+                        <div class="step"><span class="step-num">3.</span> Click <span class="tag">Add Friend</span></div>
+                        <div class="step"><span class="step-num">4.</span> Wait for them to accept</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📬</span> Managing Friend Requests</div>
+                    <div class="item-desc">Go to <a href="friends.html">Friends</a> → <span class="tag">📩 Requests</span> tab to:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">✅</span> <strong>Accept:</strong> Start chatting and sharing</div>
+                        <div class="step"><span class="step-num">❌</span> <strong>Decline:</strong> Reject the request</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🚫</span> Blocking Users</div>
+                    <div class="item-desc">Blocking a user prevents them from seeing your profile, sending messages, or interacting with you.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="friends.html">Friends</a></div>
+                        <div class="step"><span class="step-num">2.</span> Find the user and click <span class="tag error">🚫 Block</span></div>
+                        <div class="step"><span class="step-num">3.</span> Confirm the action</div>
+                    </div>
+                    <div class="item-desc">Blocked users appear in the <span class="tag warning">🚫 Blocked</span> tab. You can unblock them anytime.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: MESSAGING & CALLS
+        ============================================================ -->
+        <div class="guide-section" id="sec-messaging">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">💬</span>
+                <span class="sec-title">Messaging &amp; Calls</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">💬</span> Chatting with Friends</div>
+                    <div class="item-desc">Start a conversation with any friend.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="chat.html">Messages</a></div>
+                        <div class="step"><span class="step-num">2.</span> Click <span class="tag">✚ New Chat</span></div>
+                        <div class="step"><span class="step-num">3.</span> Select a friend from the list</div>
+                        <div class="step"><span class="step-num">4.</span> Start typing and send!</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📎</span> Sending Media in Chat</div>
+                    <div class="item-desc">You can send more than just text messages:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">🖼️</span> <strong>Images:</strong> Tap the 📎 button and select Photo</div>
+                        <div class="step"><span class="step-num">🎤</span> <strong>Voice Notes:</strong> Tap the 📎 button and select Voice</div>
+                        <div class="step"><span class="step-num">📨</span> <strong>Shared Posts:</strong> Share posts directly from the feed</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📞</span> Voice &amp; Video Calls</div>
+                    <div class="item-desc">Make real-time voice and video calls with your friends.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Open a chat with a friend</div>
+                        <div class="step"><span class="step-num">2.</span> Tap the <span class="tag">📞 Call</span> button</div>
+                        <div class="step"><span class="step-num">3.</span> Choose <span class="tag">Voice</span> or <span class="tag">Video</span></div>
+                        <div class="step"><span class="step-num">4.</span> Wait for them to answer</div>
+                    </div>
+                    <div class="item-desc">Calls are <span class="tag gold">end-to-end encrypted</span> for your privacy.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">👁️</span> Read Receipts &amp; Typing Indicators</div>
+                    <div class="item-desc">See when your messages are read (<span class="tag">✓</span> delivered, <span class="tag gold">✓✓</span> read) and when the other person is typing (<span class="tag">... typing</span>).</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🗑️</span> Deleting a Chat</div>
+                    <div class="item-desc">Permanently delete an entire conversation by clicking the 🗑️ button in the chat header.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: COMMUNITIES
+        ============================================================ -->
+        <div class="guide-section" id="sec-communities">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🏠</span>
+                <span class="sec-title">Communities</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🌍</span> What are Communities?</div>
+                    <div class="item-desc">Communities are spaces where people with shared interests can connect, share posts, and have discussions. They are the heart of SPIKE's social experience.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">➕</span> Joining a Community</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="community.html">Communities</a></div>
+                        <div class="step"><span class="step-num">2.</span> Browse the list of communities</div>
+                        <div class="step"><span class="step-num">3.</span> For <span class="tag">🌍 Public</span>: Click <span class="tag">➕ Join</span></div>
+                        <div class="step"><span class="step-num">4.</span> For <span class="tag warning">🔒 Private</span>: Click <span class="tag">🔒 Request to Join</span> and wait for admin approval</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">👑</span> Community Roles</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">👑</span> <strong>Creator:</strong> The founder of the community</div>
+                        <div class="step"><span class="step-num">🛡️</span> <strong>Admin:</strong> Manages members and approves join requests</div>
+                        <div class="step"><span class="step-num">👤</span> <strong>Member:</strong> Can post and interact</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📝</span> Posting in a Community</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Open the community</div>
+                        <div class="step"><span class="step-num">2.</span> Type your post in the "What's on your mind?" box</div>
+                        <div class="step"><span class="step-num">3.</span> Click <span class="tag">📤 Post</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🛠️</span> Community Admin Features</div>
+                    <div class="item-desc">Admins can:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">📋</span> Approve or reject join requests</div>
+                        <div class="step"><span class="step-num">👑</span> Promote or demote admins</div>
+                        <div class="step"><span class="step-num">🚫</span> Remove or suspend members</div>
+                        <div class="step"><span class="step-num">✏️</span> Edit community details (name, description, privacy)</div>
+                        <div class="step"><span class="step-num">🗑️</span> Delete the community</div>
+                        <div class="step"><span class="step-num">📌</span> Pin important posts</div>
+                        <div class="step"><span class="step-num">🚩</span> Manage reported posts</div>
+                    </div>
+                    <div class="item-desc">Admin panel is accessible via the <span class="tag">🛡️ Admin</span> button in the community detail page.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🚪</span> Leaving a Community</div>
+                    <div class="item-desc">Click the <span class="tag error">Leave</span> button in the community detail page. You will lose access to all community content.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: COINS & SHOP (NEW)
+        ============================================================ -->
+        <div class="guide-section" id="sec-coins">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🪙</span>
+                <span class="sec-title">Coins &amp; Shop</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🪙</span> What are SPIKE Coins?</div>
+                    <div class="item-desc">SPIKE Coins are the platform's virtual currency. You can use them to:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> Upgrade to <span class="tag gold">VIP</span> (200 coins), <span class="tag premium">Premium</span> (500 coins), or <span class="tag elite">Elite</span> (1,000 coins)</div>
+                        <div class="step"><span class="step-num">•</span> Send gifts to other users</div>
+                        <div class="step"><span class="step-num">•</span> Enter rooms (entry fee)</div>
+                        <div class="step"><span class="step-num">•</span> Transfer to other users via <span class="tag">SP:ID/amount</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🏪</span> The Shop</div>
+                    <div class="item-desc">Visit the <a href="shop.html">Shop</a> to view available coin packages. Prices range from $0.09 (10 coins) to $39.99 (10,000 coins).</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> <strong>Package selection:</strong> Choose the amount you need</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Contact admin:</strong> Use the <span class="tag">📞</span> button in any room to message the admin on WhatsApp</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Provide:</strong> Your name, SPIKE ID, and selected package</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Payment:</strong> Admin will send you payment details</div>
+                        <div class="step"><span class="step-num">•</span> <strong>Delivery:</strong> Coins are added within 10-30 minutes</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📡</span> Signals</div>
+                    <div class="item-desc">You can set a <span class="highlight">Signal</span> on your profile to indicate how many coins you are willing to receive from others. This helps others know that you are open to receiving coin transfers.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="shop.html">Shop</a></div>
+                        <div class="step"><span class="step-num">2.</span> Set your desired coin amount using the +/− buttons or presets</div>
+                        <div class="step"><span class="step-num">3.</span> Click <span class="tag">Set Signal</span></div>
+                        <div class="step"><span class="step-num">4.</span> Others will see your signal on your profile</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">↗️</span> Sending Coins</div>
+                    <div class="item-desc">You can send coins to any SPIKE user using the <span class="tag">SP:ID/amount</span> command in any room chat.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Type <span class="tag">SP:USER_SPIKE_ID/AMOUNT</span> (e.g., <span class="tag">SP:123456/50</span>)</div>
+                        <div class="step"><span class="step-num">2.</span> Send the message</div>
+                        <div class="step"><span class="step-num">3.</span> The coins are instantly deducted from your balance and added to the recipient</div>
+                    </div>
+                    <div class="item-desc">You can also send coins by tapping the <span class="tag">Send Coins</span> button on a user's profile (if they have a signal set).</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📊</span> Transaction History</div>
+                    <div class="item-desc">All your coin transactions (purchases, sends, and receives) are stored in your <span class="tag">📜 Transaction History</span>, visible in the Shop page.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">💎</span> Tier Benefits</div>
+                    <div class="item-desc">Upgrading to higher tiers unlocks exclusive features:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">👑</span> <strong>VIP (200 🪙):</strong> Stickers, VIP Crown, 2x daily bonus</div>
+                        <div class="step"><span class="step-num">⭐</span> <strong>Premium (500 🪙):</strong> Voice Notes, 2.5x daily bonus</div>
+                        <div class="step"><span class="step-num">🔥</span> <strong>Elite (1,000 🪙):</strong> Image Sharing, Polls, Custom Colour, Pin Messages, 4x daily bonus</div>
+                    </div>
+                    <div class="item-desc">All tier features are visible in the <span class="tag">⭐ ELITE</span> panel inside any room.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: SETTINGS & PRIVACY
+        ============================================================ -->
+        <div class="guide-section" id="sec-settings">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">⚙️</span>
+                <span class="sec-title">Settings &amp; Privacy</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🎨</span> Appearance</div>
+                    <div class="item-desc">Customize how SPIKE looks:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">🌙</span> <strong>Dark Mode:</strong> Toggle between dark and light theme</div>
+                        <div class="step"><span class="step-num">🎨</span> <strong>Accent Color:</strong> Choose from 5 colors (Green, Blue, Purple, Red, Yellow)</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔒</span> Privacy Settings</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">👀</span> <strong>Profile Visibility:</strong> Public, Friends, or Private</div>
+                        <div class="step"><span class="step-num">🔍</span> <strong>SPIKE ID Search:</strong> Everyone, Friends, or No One</div>
+                        <div class="step"><span class="step-num">📱</span> <strong>Online Status:</strong> Show when you're active</div>
+                        <div class="step"><span class="step-num">👤</span> <strong>Friend Requests:</strong> Everyone, Friends, or None</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔔</span> Notification Preferences</div>
+                    <div class="item-desc">Control which notifications you receive:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">❤️</span> Likes &amp; Reactions</div>
+                        <div class="step"><span class="step-num">💬</span> Comments &amp; Replies</div>
+                        <div class="step"><span class="step-num">👥</span> Friend Requests</div>
+                        <div class="step"><span class="step-num">🔔</span> Push Notifications</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🤫</span> Muted Words</div>
+                    <div class="item-desc">Add words or phrases to automatically hide posts containing them. This helps you filter out unwanted content.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to <a href="settings.html">Settings</a> → Content</div>
+                        <div class="step"><span class="step-num">2.</span> Type a word in the Muted Words section</div>
+                        <div class="step"><span class="step-num">3.</span> Click <span class="tag">Add</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">💾</span> Saved Posts</div>
+                    <div class="item-desc">Save posts you want to revisit later. Your saved posts are stored securely and accessible from <a href="settings.html">Settings</a>.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: SAFETY & SECURITY
+        ============================================================ -->
+        <div class="guide-section" id="sec-safety">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🛡️</span>
+                <span class="sec-title">Safety &amp; Security</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🚫</span> Blocking Users</div>
+                    <div class="item-desc">If someone is bothering you, you can block them. Blocked users cannot:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> See your profile or posts</div>
+                        <div class="step"><span class="step-num">•</span> Send you messages</div>
+                        <div class="step"><span class="step-num">•</span> Find you in search</div>
+                        <div class="step"><span class="step-num">•</span> Send friend requests</div>
+                    </div>
+                    <div class="item-desc">You can unblock users anytime from the <span class="tag warning">🚫 Blocked</span> tab in <a href="friends.html">Friends</a>.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🚩</span> Reporting Content</div>
+                    <div class="item-desc">If you see inappropriate content, you can report it for admin review.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Click the <span class="tag">⋮</span> menu on the post</div>
+                        <div class="step"><span class="step-num">2.</span> Select <span class="tag error">🚩 Report</span></div>
+                        <div class="step"><span class="step-num">3.</span> Provide a reason</div>
+                        <div class="step"><span class="step-num">4.</span> Submit</div>
+                    </div>
+                    <div class="item-desc">Admins review all reports and take appropriate action.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">⛔</span> Account Suspension</div>
+                    <div class="item-desc">If you violate community guidelines, your account may be suspended by an admin. A suspended account cannot:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">•</span> Post content</div>
+                        <div class="step"><span class="step-num">•</span> Send messages</div>
+                        <div class="step"><span class="step-num">•</span> Join communities</div>
+                        <div class="step"><span class="step-num">•</span> Interact with others</div>
+                    </div>
+                    <div class="item-desc">If you believe this is a mistake, contact support for assistance.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: ADMIN GUIDE
+        ============================================================ -->
+        <div class="guide-section" id="sec-admin">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">🛠️</span>
+                <span class="sec-title">Admin Guide</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📢</span> Announcements</div>
+                    <div class="item-desc">Admins can create scrolling announcements that appear at the top of the feed.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to Admin Dashboard</div>
+                        <div class="step"><span class="step-num">2.</span> Navigate to Announcements</div>
+                        <div class="step"><span class="step-num">3.</span> Type your announcement text</div>
+                        <div class="step"><span class="step-num">4.</span> Set an expiry date (optional)</div>
+                        <div class="step"><span class="step-num">5.</span> Click <span class="tag">💾 Save</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🚩</span> Reports Management</div>
+                    <div class="item-desc">Admins can view and manage reported posts.</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">1.</span> Go to Admin Dashboard → Reports</div>
+                        <div class="step"><span class="step-num">2.</span> Review pending reports</div>
+                        <div class="step"><span class="step-num">3.</span> <span class="tag">✓ Mark Resolved</span> or <span class="tag error">🗑️ Delete Post</span></div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🏠</span> Community Management</div>
+                    <div class="item-desc">Admins can manage all communities, including:</div>
+                    <div class="item-steps">
+                        <div class="step"><span class="step-num">📋</span> Approving join requests</div>
+                        <div class="step"><span class="step-num">👑</span> Promoting/demoting admins</div>
+                        <div class="step"><span class="step-num">🚫</span> Removing/suspending members</div>
+                        <div class="step"><span class="step-num">✏️</span> Editing community details</div>
+                        <div class="step"><span class="step-num">🗑️</span> Deleting communities</div>
+                    </div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔧</span> Maintenance Mode</div>
+                    <div class="item-desc">Admins can put the platform into maintenance mode. During maintenance, users see a "Under Maintenance" page.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🪙</span> Coin Management</div>
+                    <div class="item-desc">Admins can add or remove coins from any user's balance via the Admin Dashboard.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        SECTION: FAQ
+        ============================================================ -->
+        <div class="guide-section" id="sec-faq">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="sec-icon">❓</span>
+                <span class="sec-title">Frequently Asked Questions</span>
+                <span class="sec-toggle">▼</span>
+            </div>
+            <div class="section-body">
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔑</span> I forgot my password. How do I reset it?</div>
+                    <div class="item-desc">Click "Forgot password?" on the login page, enter your email, and follow the instructions in the reset email.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📧</span> I didn't receive the verification email. What should I do?</div>
+                    <div class="item-desc">Check your spam folder. If it's not there, you can request a new verification email from the <a href="profile.html">Profile</a> page.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🆔</span> Can I change my SPIKE ID?</div>
+                    <div class="item-desc">No. Your SPIKE ID is <span class="highlight">permanent</span> and cannot be changed. It's your unique identifier on the platform.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📝</span> Can I edit a post after posting?</div>
+                    <div class="item-desc">Yes! Click the <span class="tag">⋮</span> menu on your post and select <span class="tag">✏️ Edit</span>.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🔒</span> How do I make my profile private?</div>
+                    <div class="item-desc">Go to <a href="settings.html">Settings</a> → Privacy and set "Profile Visibility" to <span class="tag">Private</span>.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🌙</span> How do I enable Dark Mode?</div>
+                    <div class="item-desc">Go to <a href="settings.html">Settings</a> → Appearance and toggle the <span class="tag">🌙 Dark Mode</span> switch.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">✅</span> How long does verification take?</div>
+                    <div class="item-desc">After you meet the requirements and submit your application, verification typically takes <span class="tag gold">10-30 minutes</span> for admin review.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">👥</span> How do I unfriend someone?</div>
+                    <div class="item-desc">Go to <a href="friends.html">Friends</a>, find the user, and click <span class="tag warning">Unfriend</span>.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📱</span> Is SPIKE available on mobile?</div>
+                    <div class="item-desc">SPIKE is a fully responsive web app that works seamlessly on both desktop and mobile devices.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🏠</span> What's the difference between Communities and Groups?</div>
+                    <div class="item-desc">SPIKE uses a unified <span class="highlight">Communities</span> system. Communities are social spaces for shared interests with full features including posts, comments, likes, and admin controls. The old "Groups" system has been merged into Communities for a better experience.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">🪙</span> How do I buy coins?</div>
+                    <div class="item-desc">Visit the <a href="shop.html">Shop</a>, select your package, and click the <span class="tag">📞</span> button in any room to contact the admin on WhatsApp. Provide your name, SPIKE ID, and desired package. The admin will guide you through payment and coin delivery.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">📡</span> What is a signal?</div>
+                    <div class="item-desc">A signal shows other users that you are open to receiving coins. You set a desired amount in the Shop page, and it appears on your profile. Others can send you coins directly via the profile modal.</div>
+                </div>
+                <div class="guide-item">
+                    <div class="item-title"><span class="item-icon">💎</span> What are the tier benefits?</div>
+                    <div class="item-desc">See the <strong>Coins &amp; Shop</strong> section above for a full breakdown of VIP, Premium, and Elite benefits.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FOOTER NOTE ===== -->
+        <div style="text-align:center;color:var(--text-muted);font-size:0.7rem;padding:8px 0 4px;opacity:0.5;">
+            <p>📖 SPIKE Help &amp; Guide — Everything you need to know</p>
+        </div>
+
+    </main>
+
+    <!-- ============================================================
+    TOAST
+    ============================================================ -->
+    <div id="globalToast" class="toast-container">
+        <div class="toast-content">
+            <div class="toast-icon-wrapper">
+                <span class="icon" id="toastIcon">✓</span>
+            </div>
+            <div class="toast-text-group">
+                <div class="toast-title" id="toastTitle">Success</div>
+                <div class="toast-message" id="toastMessage">Action completed successfully.</div>
+            </div>
+            <button class="toast-close-btn" onclick="dismissToast()">✕</button>
+            <div class="toast-progress"></div>
+        </div>
+    </div>
+
+    <footer class="help-footer">
+        <p>Made with <span class="footer-heart">❤️</span> by SPIKE Team &nbsp;|&nbsp; © 2026 SPIKE. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ===== TOAST SYSTEM =====
+        let toastTimeout = null;
+
+        function showToast(message, type = 'success', title = '') {
+            const toast = document.getElementById('globalToast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (toastTimeout) { clearTimeout(toastTimeout);
+                toastTimeout = null; }
+
+            toast.className = 'toast-container';
+            const titles = { success: '✓ Success', error: '✕ Error', warning: '⚠️ Warning' };
+            const icons = { success: '✓', error: '✕', warning: '⚠️' };
+
+            toastTitle.textContent = title || titles[type] || 'Notification';
+            toastMessage.textContent = message;
+            toastIcon.textContent = icons[type] || '✓';
+
+            void toast.offsetWidth;
+            toast.classList.add(type, 'active');
+
+            toastTimeout = setTimeout(() => { dismissToast(); }, 3500);
+        }
+
+        function dismissToast() {
+            const toast = document.getElementById('globalToast');
+            if (!toast.classList.contains('active')) return;
+            toast.classList.add('removing');
+            setTimeout(() => {
+                toast.className = 'toast-container';
+                toast.classList.remove('removing');
+                if (toastTimeout) { clearTimeout(toastTimeout);
+                    toastTimeout = null; }
+            }, 400);
+        }
+
+        // ===== NAVIGATION =====
+        function goBack() {
+            window.location.href = 'feed.html';
+        }
+
+        function goToProfile() {
+            window.location.href = 'profile.html';
+        }
+
+        // ===== SECTION TOGGLES =====
+        function toggleSection(header) {
+            const body = header.nextElementSibling;
+            const toggle = header.querySelector('.sec-toggle');
+            if (body) {
+                body.classList.toggle('hidden');
+                if (toggle) {
+                    toggle.classList.toggle('open');
+                }
+            }
+        }
+
+        // ===== SCROLL TO SECTION =====
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const body = el.querySelector('.section-body');
+                const toggle = el.querySelector('.sec-toggle');
+                if (body && body.classList.contains('hidden')) {
+                    body.classList.remove('hidden');
+                    if (toggle) toggle.classList.add('open');
+                }
+            }
+        }
+
+        // ===== SEARCH =====
+        function handleSearch(query) {
+            const clearBtn = document.getElementById('clearSearch');
+            const sections = document.querySelectorAll('.guide-section');
+            const items = document.querySelectorAll('.guide-item');
+            const toc = document.getElementById('tocContainer');
+
+            const normalizedQuery = query.toLowerCase().trim();
+
+            if (normalizedQuery.length > 0) {
+                clearBtn.classList.add('active');
+            } else {
+                clearBtn.classList.remove('active');
+            }
+
+            if (normalizedQuery.length === 0) {
+                sections.forEach(s => s.style.display = '');
+                items.forEach(i => i.style.display = '');
+                toc.style.display = '';
+                return;
+            }
+
+            toc.style.display = 'none';
+
+            let hasResults = false;
+            sections.forEach(section => {
+                const sectionText = section.textContent.toLowerCase();
+                const itemsInSection = section.querySelectorAll('.guide-item');
+                let sectionHasMatch = false;
+
+                itemsInSection.forEach(item => {
+                    const itemText = item.textContent.toLowerCase();
+                    if (itemText.includes(normalizedQuery) || sectionText.includes(normalizedQuery)) {
+                        item.style.display = '';
+                        sectionHasMatch = true;
+                        hasResults = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                const visibleItems = section.querySelectorAll('.guide-item[style*="display: block"], .guide-item:not([style*="display: none"])');
+                if (visibleItems.length > 0 || sectionText.includes(normalizedQuery)) {
+                    section.style.display = '';
+                    const body = section.querySelector('.section-body');
+                    const toggle = section.querySelector('.sec-toggle');
+                    if (body && body.classList.contains('hidden')) {
+                        body.classList.remove('hidden');
+                        if (toggle) toggle.classList.add('open');
+                    }
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            if (!hasResults) {
+                let noResults = document.getElementById('noSearchResults');
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.id = 'noSearchResults';
+                    noResults.style.cssText = `
+                        text-align: center;
+                        color: var(--text-muted);
+                        padding: 30px 20px;
+                        font-size: 0.9rem;
+                        width: 100%;
+                        max-width: 560px;
+                    `;
+                    noResults.innerHTML = `
+                        <div style="font-size:2.5rem;margin-bottom:8px;">🔍</div>
+                        <p>No results found for "<strong id="searchQueryDisplay"></strong>"</p>
+                        <p style="font-size:0.8rem;margin-top:4px;opacity:0.6;">Try different keywords or browse the table of contents.</p>
+                    `;
+                    document.querySelector('.help-main').appendChild(noResults);
+                }
+                document.getElementById('searchQueryDisplay').textContent = query;
+                noResults.style.display = 'block';
+            } else {
+                const noResults = document.getElementById('noSearchResults');
+                if (noResults) noResults.style.display = 'none';
+            }
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            handleSearch('');
+            document.getElementById('clearSearch').classList.remove('active');
+            const noResults = document.getElementById('noSearchResults');
+            if (noResults) noResults.style.display = 'none';
+            document.getElementById('tocContainer').style.display = '';
+            input.focus();
+        }
+
+        // ===== APPLY THEME =====
+        function applyTheme() {
+            try {
+                const saved = localStorage.getItem('spikeSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    if (!settings.darkMode) {
+                        document.body.classList.add('light-mode');
+                    }
+                    if (settings.accentColor) {
+                        document.documentElement.style.setProperty('--primary', settings.accentColor);
+                        document.documentElement.style.setProperty('--primary-glow', settings.accentColor + '40');
+                        document.documentElement.style.setProperty('--primary-hover', settings.accentColor);
+                    }
+                }
+            } catch (e) {}
+        }
+        applyTheme();
+
+        // ===== EXPOSE GLOBALLY =====
+        window.goBack = goBack;
+        window.goToProfile = goToProfile;
+        window.toggleSection = toggleSection;
+        window.scrollToSection = scrollToSection;
+        window.handleSearch = handleSearch;
+        window.clearSearch = clearSearch;
+        window.showToast = showToast;
+        window.dismissToast = dismissToast;
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📖 SPIKE Help & Guide loaded successfully');
+            console.log('📚 Updated with: Coins, Shop, Signals, Tiers (VIP/Premium/Elite), Admin Contact');
+            console.log('🪙 All coin-related topics documented.');
+            console.log('✅ Groups merged into Communities (as before).');
+        });
+    </script>
+
+</body>
+</html>

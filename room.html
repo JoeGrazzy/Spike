@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>SPIKE Elite · Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & ROOT ===== */
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    :root {
+      --bg-primary: #0a0f16;
+      --bg-secondary: #111a24;
+      --bg-card: #1a2633;
+      --bg-input: #1a2633;
+      --bg-bubble-other: #1a2633;
+      --bg-bubble-self: #0084ff;
+      --bg-header: #0d1520;
+      --bg-footer: #0d1520;
+      --text-primary: #e8edf4;
+      --text-secondary: #8899aa;
+      --text-muted: #5a6e8a;
+      --text-bubble-self: #fff;
+      --border-color: #1e2a3a;
+      --accent: #0084ff;
+      --accent-glow: rgba(0,132,255,0.3);
+      --gold: #ffd700;
+      --error: #f43f5e;
+      --success: #00c853;
+      --premium: #7c3aed;
+      --elite: #f97316;
+      --font: 'Inter', system-ui, sans-serif;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.4);
+      --safe-top: env(safe-area-inset-top,0px);
+      --safe-bottom: env(safe-area-inset-bottom,0px);
+      --header-height: 52px;
+      --toast-z: 9999;
+    }
+    html, body { width:100%; height:100%; overflow:hidden; background:var(--bg-primary); color:var(--text-primary); font-family:var(--font); font-size:14px; }
+    body { display:flex; flex-direction:column; padding-top:var(--safe-top); padding-bottom:var(--safe-bottom); }
+    .messages-container::-webkit-scrollbar { width:3px; }
+    .messages-container::-webkit-scrollbar-thumb { background:var(--border-color); border-radius:10px; }
+    /* ===== HEADER ===== */
+    .room-header { background:var(--bg-header); border-bottom:1px solid var(--border-color); padding:0 8px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; min-height:var(--header-height); height:var(--header-height); gap:4px; position:sticky; top:0; z-index:10; }
+    .room-header .left { display:flex; align-items:center; gap:4px; min-width:0; flex:1; overflow:hidden; }
+    .room-header .back-btn { background:none; border:none; color:var(--text-secondary); font-size:22px; cursor:pointer; padding:0 4px; min-height:36px; min-width:32px; border-radius:8px; flex-shrink:0; }
+    .room-header .room-info { display:flex; flex-direction:column; min-width:0; flex:1; overflow:hidden; }
+    .room-header .room-name { font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .room-header .room-name .elite-badge { font-size:7px; background:var(--elite); color:#fff; padding:0 5px; border-radius:3px; font-weight:800; text-transform:uppercase; margin-left:2px; }
+    .room-header .room-meta { font-size:10px; color:var(--text-secondary); display:flex; align-items:center; gap:4px; overflow:hidden; }
+    .room-header .room-meta .dot { width:5px; height:5px; border-radius:50%; display:inline-block; flex-shrink:0; }
+    .room-header .room-meta .dot.online { background:var(--success); }
+    .room-header .right { display:flex; align-items:center; gap:2px; flex-shrink:0; max-width:70%; }
+    .room-header .header-btn { background:none; border:none; color:var(--text-secondary); font-size:16px; cursor:pointer; padding:0 4px; min-height:36px; min-width:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; }
+    .room-header .header-btn .badge { position:absolute; top:2px; right:1px; background:var(--error); color:#fff; font-size:7px; font-weight:700; width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .room-header .header-btn .badge-gift { position:absolute; top:2px; right:1px; background:var(--gold); color:#0d1520; font-size:7px; font-weight:700; width:14px; height:14px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+    .room-header .coins-badge { background:rgba(0,132,255,0.12); border:1px solid rgba(0,132,255,0.15); border-radius:20px; padding:0 8px; font-size:11px; font-weight:700; color:var(--accent); display:flex; align-items:center; gap:3px; min-height:28px; flex-shrink:0; white-space:nowrap; }
+    .room-header .premium-btn { background:linear-gradient(135deg,var(--premium),#6d28d9); border:none; border-radius:20px; padding:0 10px; font-size:9px; font-weight:700; color:#fff; cursor:pointer; min-height:28px; box-shadow:0 0 16px rgba(124,58,237,0.3); flex-shrink:0; white-space:nowrap; }
+    .room-header .more-btn { background:none; border:none; color:var(--text-secondary); font-size:18px; cursor:pointer; padding:0 4px; min-height:36px; min-width:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .header-more-dropdown { position:absolute; top:calc(var(--header-height) + 4px); right:4px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); padding:4px 0; min-width:160px; box-shadow:var(--shadow); z-index:20; display:none; }
+    .header-more-dropdown.open { display:block; }
+    .header-more-dropdown .item { padding:8px 14px; font-size:13px; font-weight:500; color:var(--text-primary); cursor:pointer; display:flex; align-items:center; gap:8px; background:none; border:none; width:100%; font-family:var(--font); min-height:38px; text-align:left; }
+    .header-more-dropdown .item .icon { font-size:16px; width:24px; text-align:center; flex-shrink:0; }
+    .header-more-dropdown .divider { height:1px; background:var(--border-color); margin:4px 8px; }
+    /* ===== INFO BAR ===== */
+    .room-info-bar { background:var(--bg-secondary); border-bottom:1px solid var(--border-color); padding:2px 10px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; min-height:28px; font-size:10px; color:var(--text-secondary); gap:6px; overflow:hidden; }
+    .room-info-bar .fee { color:var(--accent); font-weight:600; white-space:nowrap; }
+    .room-info-bar .members .count { font-weight:700; color:var(--text-primary); }
+    .room-info-bar .tier-tag { font-weight:700; font-size:8px; padding:0 6px; border-radius:10px; border:1px solid transparent; white-space:nowrap; display:none; }
+    .room-info-bar .tier-tag.vip { color:var(--gold); border-color:rgba(255,215,0,0.2); background:rgba(255,215,0,0.06); }
+    .room-info-bar .tier-tag.premium { color:var(--premium); border-color:rgba(124,58,237,0.2); background:rgba(124,58,237,0.06); }
+    .room-info-bar .tier-tag.elite { color:var(--elite); border-color:rgba(249,115,22,0.2); background:rgba(249,115,22,0.06); }
+    .room-info-bar .tier-tag.show { display:inline-block; }
+    /* ===== SEARCH ===== */
+    .search-bar { background:var(--bg-secondary); border-bottom:1px solid var(--border-color); padding:4px 10px; display:none; align-items:center; gap:6px; flex-shrink:0; min-height:36px; }
+    .search-bar.open { display:flex; }
+    .search-bar input { flex:1; background:var(--bg-input); border:1px solid var(--border-color); border-radius:20px; padding:4px 12px; color:var(--text-primary); font-size:13px; font-family:var(--font); outline:none; min-height:30px; }
+    .search-bar input:focus { border-color:var(--accent); }
+    .search-bar .search-close { background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer; min-height:30px; min-width:30px; }
+    /* ===== MESSAGES ===== */
+    .messages-container { flex:1; overflow-y:auto; padding:6px 10px; display:flex; flex-direction:column; gap:2px; scroll-behavior:smooth; background:var(--bg-primary); }
+    .msg { max-width:88%; padding:5px 10px; border-radius:var(--radius); animation:msgIn 0.15s ease; word-wrap:break-word; margin-bottom:1px; font-size:13px; }
+    .msg.other { align-self:flex-start; background:var(--bg-bubble-other); border-bottom-left-radius:4px; }
+    .msg.self { align-self:flex-end; background:var(--bg-bubble-self); border-bottom-right-radius:4px; color:var(--text-bubble-self); }
+    .msg .sender { font-size:10px; font-weight:700; color:var(--accent); margin-bottom:1px; display:flex; align-items:center; gap:3px; flex-wrap:wrap; }
+    .msg.self .sender { color:rgba(255,255,255,0.7); }
+    .msg .sender .crown { color:var(--gold); }
+    .msg .sender .premium-badge-sender { color:var(--premium); font-size:7px; font-weight:800; background:rgba(124,58,237,0.15); padding:0 4px; border-radius:3px; }
+    .msg .sender .elite-badge-sender { color:var(--elite); font-size:7px; font-weight:800; background:rgba(249,115,22,0.15); padding:0 4px; border-radius:3px; }
+    .msg .text { font-size:13px; line-height:1.4; }
+    .msg .time { font-size:8px; color:var(--text-muted); margin-top:2px; text-align:right; opacity:0.6; display:flex; align-items:center; justify-content:flex-end; gap:4px; }
+    .msg .msg-actions { display:none; gap:3px; margin-top:2px; }
+    .msg:hover .msg-actions { display:flex; }
+    .msg .msg-actions button { background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:4px; padding:0 5px; font-size:8px; color:var(--text-muted); cursor:pointer; font-family:var(--font); min-height:20px; }
+    .msg .msg-actions button.danger { color:var(--error); }
+    .msg .reactions { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
+    .msg .reactions .reaction { background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:12px; padding:0 5px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:2px; min-height:20px; }
+    .msg .reactions .reaction .r-count { font-size:9px; color:var(--text-muted); }
+    .msg .reactions .reaction.active { border-color:var(--accent); background:rgba(0,132,255,0.08); }
+    .msg .voice-msg { display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:8px; margin-top:3px; }
+    .msg .voice-msg button { background:none; border:none; color:var(--text-primary); font-size:16px; cursor:pointer; }
+    .msg .voice-msg .wave { flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:4px; position:relative; overflow:hidden; }
+    .msg .voice-msg .wave .fill { height:100%; background:var(--accent); width:0%; border-radius:4px; }
+    .msg .voice-msg .duration { font-size:10px; color:var(--text-muted); }
+    .msg .sticker { font-size:40px; display:block; margin:2px 0; }
+    .system-msg { text-align:center; font-size:10px; color:var(--text-muted); padding:3px 0; opacity:0.6; font-style:italic; }
+    .empty-state { text-align:center; color:var(--text-muted); padding:30px 16px; font-size:13px; }
+    .empty-state .icon { font-size:34px; display:block; margin-bottom:6px; }
+    @keyframes msgIn { from { opacity:0; transform:translateY(4px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+    /* ===== TYPING ===== */
+    .typing-indicator { padding:2px 12px 4px; font-size:10px; color:var(--text-muted); font-style:italic; display:none; flex-shrink:0; min-height:18px; }
+    .typing-indicator.active { display:block; }
+    /* ===== INPUT ===== */
+    .input-area { background:var(--bg-footer); border-top:1px solid var(--border-color); padding:6px 10px; display:flex; flex-direction:column; gap:4px; flex-shrink:0; padding-bottom:calc(6px + var(--safe-bottom)); }
+    .input-area .input-row { display:flex; align-items:center; gap:4px; }
+    .input-area .input-wrapper { flex:1; display:flex; align-items:center; background:var(--bg-input); border:1px solid var(--border-color); border-radius:20px; padding:0 8px; min-height:36px; gap:2px; cursor:text; }
+    .input-area .input-wrapper:focus-within { border-color:var(--accent); }
+    .input-area .input-wrapper input { flex:1; background:none; border:none; outline:none; color:var(--text-primary); font-size:13px; font-family:var(--font); padding:4px 0; min-height:28px; width:100%; }
+    .input-area .input-wrapper input::placeholder { color:var(--text-muted); font-size:12px; }
+    .input-area .input-wrapper .input-icon { color:var(--text-muted); font-size:14px; padding:0 2px; cursor:pointer; min-height:28px; min-width:28px; display:flex; align-items:center; justify-content:center; position:relative; border-radius:6px; flex-shrink:0; }
+    .input-area .input-wrapper .input-icon .lock-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); border-radius:6px; font-size:8px; color:var(--gold); backdrop-filter:blur(2px); }
+    .input-area .send-btn { background:var(--accent); border:none; border-radius:50%; width:36px; height:36px; min-width:36px; min-height:36px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; cursor:pointer; box-shadow:0 0 12px var(--accent-glow); position:relative; flex-shrink:0; }
+    .input-area .send-btn .cost-badge { position:absolute; bottom:-4px; right:-4px; background:var(--gold); color:#0d1520; font-size:7px; font-weight:800; padding:0 4px; border-radius:8px; line-height:14px; min-width:16px; text-align:center; }
+    .input-area .cost-indicator { text-align:center; font-size:9px; color:var(--text-muted); opacity:0.6; }
+    /* ===== TOAST ===== */
+    .toast-container { position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-120px); z-index:var(--toast-z); width:calc(100% - 32px); max-width:380px; opacity:0; visibility:hidden; transition:all 0.5s cubic-bezier(0.16,1,0.3,1); pointer-events:none; }
+    .toast-container.active { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+    .toast-content { background:var(--bg-secondary); backdrop-filter:blur(24px); border:1px solid var(--border-color); border-radius:14px; padding:10px 14px; display:flex; align-items:flex-start; gap:10px; box-shadow:0 16px 48px rgba(0,0,0,0.7); position:relative; overflow:hidden; }
+    .toast-content .toast-icon-wrapper { width:30px; height:30px; min-width:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+    .toast-content .toast-icon-wrapper.success { background:rgba(0,200,83,0.12); color:var(--success); }
+    .toast-content .toast-icon-wrapper.error { background:rgba(244,63,94,0.12); color:var(--error); }
+    .toast-content .toast-body { flex:1; min-width:0; }
+    .toast-content .toast-title { font-size:13px; font-weight:800; color:var(--text-primary); }
+    .toast-content .toast-message { font-size:11px; font-weight:500; color:var(--text-secondary); margin-top:1px; }
+    .toast-content .toast-close { background:rgba(255,255,255,0.04); border:none; border-radius:50%; width:22px; height:22px; min-width:22px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; font-size:12px; flex-shrink:0; }
+    .toast-progress { position:absolute; bottom:0; left:0; height:2px; border-radius:0 0 14px 14px; width:100%; animation:toastProgress 3.5s linear forwards; }
+    .toast-progress.success { background:var(--success); }
+    .toast-progress.error { background:var(--error); }
+    .toast-progress.info { background:var(--accent); }
+    @keyframes toastProgress { 0% { width:100%; } 100% { width:0%; } }
+    /* ===== CONFIRM ===== */
+    .confirm-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(4px); z-index:10000; display:none; align-items:center; justify-content:center; padding:20px; }
+    .confirm-overlay.active { display:flex; }
+    .confirm-modal { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); padding:16px 14px; max-width:320px; width:100%; box-shadow:var(--shadow); text-align:center; }
+    .confirm-modal .actions { display:flex; gap:6px; margin-top:10px; }
+    .confirm-modal .actions button { flex:1; padding:8px; border-radius:10px; border:none; font-weight:700; font-size:13px; cursor:pointer; font-family:var(--font); min-height:36px; }
+    .confirm-modal .actions .cancel { background:rgba(255,255,255,0.04); color:var(--text-secondary); border:1px solid var(--border-color); }
+    .confirm-modal .actions .danger { background:var(--error); color:#fff; }
+    .confirm-modal .actions .primary { background:var(--accent); color:#fff; }
+    /* ===== STICKER PICKER ===== */
+    .sticker-picker-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:850; display:none; align-items:center; justify-content:center; padding:20px; }
+    .sticker-picker-overlay.open { display:flex; }
+    .sticker-picker { background:var(--bg-secondary); border-radius:var(--radius); padding:14px; max-width:380px; width:100%; max-height:70vh; overflow-y:auto; box-shadow:var(--shadow); }
+    .sticker-picker .sticker-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:4px; }
+    .sticker-picker .sticker-grid button { background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:8px; padding:4px; font-size:24px; cursor:pointer; min-height:48px; }
+    .sticker-picker .sticker-close { background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer; min-height:32px; min-width:32px; float:right; }
+    /* ===== REACTION PICKER ===== */
+    .reaction-picker-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(4px); z-index:800; display:none; align-items:center; justify-content:center; }
+    .reaction-picker-overlay.open { display:flex; }
+    .reaction-picker { background:var(--bg-secondary); border-radius:var(--radius); padding:10px 14px; box-shadow:var(--shadow); }
+    .reaction-picker .reaction-grid { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+    .reaction-picker .reaction-grid button { background:none; border:none; font-size:24px; cursor:pointer; padding:2px 6px; border-radius:8px; min-height:38px; min-width:38px; }
+    /* ===== GIFT RAIN ===== */
+    .gift-rain { position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden; }
+    .gift-rain .drop { position:absolute; font-size:24px; animation:rainFall linear forwards; }
+    @keyframes rainFall { 0% { transform:translateY(-10vh) rotate(0deg) scale(0.5); opacity:1; } 100% { transform:translateY(110vh) rotate(720deg) scale(1.2); opacity:0; } }
+    /* ===== PARTICIPANTS ===== */
+    .participants-panel { position:fixed; right:0; top:0; bottom:0; width:270px; max-width:82vw; background:var(--bg-secondary); border-left:1px solid var(--border-color); padding:14px 10px; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); z-index:51; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+    .participants-panel.open { transform:translateX(0); }
+    .participants-panel .participant { display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:8px; cursor:pointer; min-height:34px; }
+    .participants-panel .participant .info .name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .participants-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(4px); z-index:50; display:none; }
+    .participants-overlay.open { display:block; }
+    /* ===== PROFILE MODAL ===== */
+    .profile-modal-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:9000; display:none; align-items:center; justify-content:center; padding:20px; }
+    .profile-modal-overlay.open { display:flex; }
+    .profile-modal { background:var(--bg-secondary); border-radius:var(--radius); max-width:460px; width:100%; max-height:90vh; overflow-y:auto; padding:20px; box-shadow:var(--shadow); }
+    .profile-modal .profile-avatar { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#0055aa); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:#fff; margin:0 auto 6px; overflow:hidden; }
+    .profile-modal .profile-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+    .profile-modal .profile-actions button { flex:1; padding:6px 10px; border:none; border-radius:10px; font-weight:700; font-size:0.75rem; cursor:pointer; min-height:36px; min-width:60px; }
+    .profile-modal .profile-actions .btn-send-coins { background:var(--gold); color:#0d1520; }
+    .profile-modal .profile-actions .btn-send-gift { background:var(--accent); color:#fff; }
+    .profile-modal .profile-actions .btn-message { background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-color); }
+    .profile-modal .profile-actions .btn-close { background:rgba(255,255,255,0.04); color:var(--text-muted); border:1px solid var(--border-color); flex:0.3; }
+    /* ===== GIFT SEND ===== */
+    .gift-send-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:2100; display:none; align-items:center; justify-content:center; padding:20px; }
+    .gift-send-overlay.open { display:flex; }
+    .gift-send-modal { background:var(--bg-secondary); border-radius:var(--radius); max-width:400px; width:100%; max-height:80vh; overflow-y:auto; padding:20px; box-shadow:var(--shadow); }
+    .gift-send-modal .gift-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:8px 0; }
+    .gift-send-modal .gift-grid button { background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:10px; padding:6px; font-size:24px; cursor:pointer; min-height:54px; display:flex; flex-direction:column; align-items:center; gap:1px; }
+    .gift-send-modal .gift-grid button.selected { border-color:var(--accent); background:rgba(0,132,255,0.08); }
+    .gift-send-modal .send-actions { display:flex; gap:8px; margin-top:4px; }
+    .gift-send-modal .send-actions button { flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; font-size:0.8rem; cursor:pointer; min-height:40px; }
+    .gift-send-modal .send-actions .btn-send-gift { background:var(--gold); color:#0d1520; }
+    .gift-send-modal .send-actions .btn-cancel { background:rgba(255,255,255,0.04); color:var(--text-muted); border:1px solid var(--border-color); flex:0.4; }
+    /* ===== GIFTS PANEL ===== */
+    .gifts-panel-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:2200; display:none; align-items:center; justify-content:center; padding:20px; }
+    .gifts-panel-overlay.open { display:flex; }
+    .gifts-panel { background:var(--bg-secondary); border-radius:var(--radius); max-width:480px; width:100%; max-height:85vh; overflow-y:auto; padding:20px; box-shadow:var(--shadow); }
+    .gifts-panel .gift-item { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:10px; padding:6px 10px; margin-bottom:6px; }
+    .gifts-panel .gift-item .gift-emoji { font-size:24px; width:36px; text-align:center; flex-shrink:0; }
+    .gifts-panel .gift-item .gift-actions button { background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:6px; padding:2px 8px; font-size:0.65rem; font-weight:600; cursor:pointer; color:var(--text-muted); min-height:28px; font-family:var(--font); }
+    .gifts-panel .gift-item .gift-actions button.convert { color:var(--gold); border-color:rgba(255,215,0,0.2); }
+    .gifts-panel .panel-actions { margin-top:10px; display:flex; gap:8px; }
+    .gifts-panel .panel-actions button { flex:1; padding:8px; border:none; border-radius:8px; font-weight:700; font-size:0.75rem; cursor:pointer; font-family:var(--font); min-height:36px; }
+    .gifts-panel .panel-actions .convert-all { background:var(--gold); color:#0d1520; }
+    /* ===== SEND COINS ===== */
+    .send-coins-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:2100; display:none; align-items:center; justify-content:center; padding:20px; }
+    .send-coins-overlay.open { display:flex; }
+    .send-coins-modal { background:var(--bg-secondary); border-radius:var(--radius); max-width:420px; width:100%; max-height:85vh; overflow-y:auto; padding:20px; box-shadow:var(--shadow); }
+    .send-coins-modal .amount-input input { width:100%; background:var(--bg-input); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; color:var(--text-primary); font-size:16px; font-family:var(--font); outline:none; min-height:40px; }
+    .send-coins-modal .send-actions .btn-send-coins { background:var(--gold); color:#0d1520; flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; cursor:pointer; min-height:44px; }
+    .send-coins-modal .send-actions .btn-cancel { background:rgba(255,255,255,0.04); color:var(--text-muted); border:1px solid var(--border-color); flex:0.4; padding:10px; border-radius:10px; font-weight:700; cursor:pointer; }
+    /* ===== CONTACT ADMIN ===== */
+    .contact-modal-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(8px); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+    .contact-modal-overlay.open { display:flex; }
+    .contact-modal { background:var(--bg-secondary); border-radius:var(--radius); max-width:480px; width:100%; max-height:80vh; overflow-y:auto; padding:20px; box-shadow:var(--shadow); }
+    .contact-modal .packages-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin:6px 0 10px; }
+    .contact-modal .packages-grid .pkg-btn { background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:8px; padding:4px 6px; text-align:center; cursor:pointer; font-family:var(--font); font-size:11px; color:var(--text-secondary); min-height:44px; }
+    .contact-modal .packages-grid .pkg-btn .pkg-amount { font-weight:700; font-size:13px; display:block; color:var(--gold); }
+    .contact-modal .contact-actions .btn-whatsapp { background:#25D366; color:#fff; flex:1; padding:10px; border:none; border-radius:10px; font-weight:700; cursor:pointer; min-height:40px; }
+    /* ===== PREMIUM PANEL ===== */
+    .premium-panel-overlay { position:fixed; inset:0; background:var(--bg-overlay); backdrop-filter:blur(16px); z-index:3000; display:none; align-items:center; justify-content:center; padding:16px; }
+    .premium-panel-overlay.open { display:flex; }
+    .premium-panel { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); max-width:560px; width:100%; max-height:92vh; overflow-y:auto; padding:20px; box-shadow:0 24px 80px rgba(0,0,0,0.9); }
+    .premium-panel .panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .premium-panel .panel-head .close-btn { background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; font-size:16px; }
+    .premium-panel .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:12px; }
+    .premium-panel .feature-item { background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:10px; padding:8px 10px; display:flex; align-items:center; gap:8px; min-height:44px; }
+    .premium-panel .feature-item .f-status { font-size:0.7rem; font-weight:700; flex-shrink:0; padding:2px 8px; border-radius:12px; }
+    .premium-panel .feature-item .f-status.unlocked { color:var(--success); background:rgba(0,200,83,0.08); }
+    .premium-panel .feature-item .f-status.locked { color:var(--text-muted); background:rgba(255,255,255,0.04); }
+    .premium-panel .upgrade-buttons { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .premium-panel .upgrade-buttons button { flex:1; min-width:70px; padding:8px 12px; border:none; border-radius:10px; font-weight:700; font-size:0.7rem; cursor:pointer; min-height:40px; }
+    .premium-panel .upgrade-buttons .vip-upgrade { background:linear-gradient(135deg,var(--gold),#f59e0b); color:#0d1520; }
+    .premium-panel .upgrade-buttons .premium-upgrade { background:linear-gradient(135deg,var(--premium),#6d28d9); color:#fff; }
+    .premium-panel .upgrade-buttons .elite-upgrade { background:linear-gradient(135deg,var(--elite),#ea580c); color:#fff; }
+    .premium-panel .upgrade-buttons button:disabled { opacity:0.4; cursor:not-allowed; }
+    .premium-panel .notif-feed { max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; margin-top:4px; }
+    .premium-panel .notif-item { font-size:0.7rem; color:var(--text-secondary); padding:4px 8px; background:rgba(255,255,255,0.02); border-radius:6px; border-left:2px solid var(--border-color); display:flex; align-items:center; gap:6px; min-height:28px; }
+    /* ===== USER MENU ===== */
+    .user-menu { position:fixed; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); padding:3px 0; min-width:150px; box-shadow:var(--shadow); z-index:8001; display:none; }
+    .user-menu .item { padding:6px 12px; font-size:12px; font-weight:500; color:var(--text-primary); cursor:pointer; display:flex; align-items:center; gap:6px; border:none; background:none; width:100%; font-family:var(--font); min-height:34px; }
+    .user-menu .item.danger { color:var(--error); }
+    .user-menu-overlay { position:fixed; inset:0; z-index:8000; display:none; }
+    .user-menu-overlay.active { display:block; }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width:374px) { .msg { font-size:12px; padding:4px 8px; } .input-area .input-wrapper { min-height:32px; } .input-area .send-btn { width:32px; height:32px; min-width:32px; min-height:32px; font-size:14px; } }
+    @media (pointer:coarse) { .back-btn,.header-btn,.send-btn,.participant,.confirm-modal .actions button,.user-menu .item,.toast-close,.premium-btn,.gift-send-modal .gift-grid button,.gift-send-modal .send-actions button,.sticker-picker .sticker-grid button,.reaction-picker .reaction-grid button,.search-close,.input-area .input-wrapper .input-icon,.contact-modal .contact-actions button,.contact-modal .packages-grid .pkg-btn,.profile-modal .profile-actions button,.send-coins-modal .send-actions button,.more-btn,.premium-panel .panel-head .close-btn,.premium-panel .upgrade-buttons button { min-height:44px; min-width:44px; } }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="room-header">
+  <div class="left">
+    <button class="back-btn" onclick="window.location.href='rooms.html'">‹</button>
+    <div class="room-info">
+      <div class="room-name" id="roomName">Loading… <span class="elite-badge">ELITE</span></div>
+      <div class="room-meta"><span id="roomMembers">👥 0</span><span class="sep">·</span><span class="dot online" id="roomStatusDot"></span><span id="roomStatusText">online</span></div>
+    </div>
+  </div>
+  <div class="right">
+    <span class="coins-badge">🪙 <span id="headerCoins">0</span></span>
+    <button class="header-btn" onclick="openSendCoinsModal()">💸</button>
+    <button class="header-btn" onclick="openGiftsPanel()">🎁<span class="badge-gift" id="giftBadge">0</span></button>
+    <button class="header-btn" onclick="toggleSearch()">🔍</button>
+    <button class="premium-btn" onclick="openPremiumPanel()">⭐ ELITE</button>
+    <button class="header-btn" onclick="toggleParticipants()">👥<span class="badge" id="memberBadge">0</span></button>
+    <button class="more-btn" id="moreBtn" onclick="toggleMoreDropdown()">⋯</button>
+    <div class="header-more-dropdown" id="moreDropdown">
+      <button class="item" onclick="openSendCoinsModal();closeMoreDropdown()">💸 Send Coins</button>
+      <button class="item" onclick="openGiftSendModal();closeMoreDropdown()">🎁 Send Gift</button>
+      <button class="item" onclick="window.location.href='shop.html';closeMoreDropdown()">🪙 Shop</button>
+      <button class="item" onclick="openContactModal();closeMoreDropdown()">📞 Contact Admin</button>
+      <div class="divider"></div>
+      <button class="item" onclick="openGiftsPanel();closeMoreDropdown()">🎁 My Gifts</button>
+      <button class="item" onclick="toggleParticipants();closeMoreDropdown()">👥 Members</button>
+      <button class="item" onclick="openPremiumPanel();closeMoreDropdown()">⭐ Premium</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== INFO BAR ===== -->
+<div class="room-info-bar">
+  <span class="fee" id="roomFee">Entry: 🪙 50</span>
+  <span class="members">👥 <span class="count" id="memberCount">0</span> online</span>
+  <div class="tier-tags"><span class="tier-tag vip" id="vipTag">👑 VIP</span><span class="tier-tag premium" id="premiumTag">⭐ PREMIUM</span><span class="tier-tag elite" id="eliteTag">🔥 ELITE</span></div>
+</div>
+
+<!-- ===== SEARCH ===== -->
+<div class="search-bar" id="searchBar"><input type="text" id="searchInput" placeholder="Search messages…" oninput="performSearch(this.value)" /><button class="search-close" onclick="toggleSearch()">✕</button></div>
+
+<!-- ===== MESSAGES ===== -->
+<div class="messages-container" id="messagesContainer"><div class="empty-state"><span class="icon">💬</span>No messages yet.<br />Say hello!</div></div>
+
+<!-- ===== TYPING ===== -->
+<div class="typing-indicator" id="typingIndicator">Someone is typing…</div>
+
+<!-- ===== INPUT ===== -->
+<div class="input-area" id="bottomInputArea">
+  <div class="input-row">
+    <div class="input-wrapper">
+      <span class="input-icon" onclick="toggleStickerPicker()">😊<span class="lock-overlay" id="stickerLock" style="display:none;">🔒</span></span>
+      <span class="input-icon" onclick="toggleVoiceRecorder()">🎤<span class="lock-overlay" id="voiceLock" style="display:none;">🔒</span></span>
+      <span class="input-icon" onclick="triggerImageUpload()">🖼️<span class="lock-overlay" id="imageLock" style="display:none;">🔒</span></span>
+      <input type="text" id="msgInput" placeholder="Type a message… (1🪙)" onkeydown="if(event.key==='Enter') sendMessage()" disabled />
+      <span class="input-icon" onclick="insertMention()" style="font-size:11px;font-weight:700;">@</span>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>➤<span class="cost-badge" id="msgCostBadge">1</span></button>
+  </div>
+  <div class="cost-indicator">🪙 Text: 1 &nbsp;|&nbsp; Sticker: 2 &nbsp;|&nbsp; Voice: 3 &nbsp;|&nbsp; Image: 5</div>
+</div>
+
+<!-- ===== TYPING OVERLAY ===== -->
+<div class="typing-overlay" id="typingOverlay" style="display:none; position:fixed; inset:0; background:rgba(10,15,22,0.85); backdrop-filter:blur(16px); z-index:3000; align-items:center; justify-content:center; padding:20px;">
+  <div class="typing-card" style="max-width:560px; width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius); padding:24px 28px 28px; box-shadow:0 24px 80px rgba(0,0,0,0.9); max-height:90vh; display:flex; flex-direction:column;">
+    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <span style="font-weight:700;">✏️ Compose</span>
+      <button class="card-close" onclick="closeTypingOverlay()" style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color); border-radius:50%; width:36px; height:36px; color:var(--text-muted); cursor:pointer; font-size:18px;">✕</button>
+    </div>
+    <textarea id="typingTextarea" placeholder="What's on your mind?" rows="4" style="width:100%; min-height:160px; max-height:50vh; background:var(--bg-input); border:1px solid var(--border-color); border-radius:12px; padding:14px 16px; color:var(--text-primary); font-size:1rem; font-family:var(--font); resize:vertical; outline:none; flex:1; line-height:1.5;"></textarea>
+    <div class="char-count" style="text-align:right; font-size:0.7rem; color:var(--text-muted); margin-top:6px;"><span id="charCount">0</span> characters</div>
+    <div class="input-tools" style="display:flex; align-items:center; justify-content:space-between; margin-top:12px; gap:8px; flex-wrap:wrap;">
+      <div class="tool-group" style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button onclick="toggleStickerPicker()" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:4px 8px; font-size:16px; cursor:pointer; min-height:40px; min-width:40px; color:var(--text-muted);">😊</button>
+        <button onclick="toggleVoiceRecorder()" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:4px 8px; font-size:16px; cursor:pointer; min-height:40px; min-width:40px; color:var(--text-muted);">🎤</button>
+        <button onclick="triggerImageUpload()" style="background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:4px 8px; font-size:16px; cursor:pointer; min-height:40px; min-width:40px; color:var(--text-muted);">🖼️</button>
+        <button onclick="insertMentionOverlay()" style="font-weight:700; font-size:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:8px; padding:4px 8px; cursor:pointer; min-height:40px; min-width:40px; color:var(--text-muted);">@</button>
+      </div>
+      <div class="send-action" style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:0.8rem; font-weight:700; color:var(--gold);">🪙 <span id="typingCostBadge">1</span></span>
+        <button class="btn-send-overlay" onclick="sendMessageFromOverlay()" style="background:var(--accent); border:none; border-radius:10px; padding:8px 24px; font-weight:700; font-size:0.9rem; color:#fff; cursor:pointer; min-height:40px; box-shadow:0 0 16px var(--accent-glow); font-family:var(--font);">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS (hidden inputs / overlays) ===== -->
+<input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)" />
+
+<!-- STICKER PICKER -->
+<div class="sticker-picker-overlay" id="stickerPickerOverlay" onclick="closeStickerPicker()">
+  <div class="sticker-picker" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span>😊 Stickers (2🪙)</span><button class="sticker-close" onclick="closeStickerPicker()">✕</button></div>
+    <div class="sticker-grid" id="stickerGrid"></div>
+  </div>
+</div>
+
+<!-- REACTION PICKER -->
+<div class="reaction-picker-overlay" id="reactionPickerOverlay" onclick="closeReactionPicker()">
+  <div class="reaction-picker" onclick="event.stopPropagation()">
+    <div class="reaction-grid">
+      <button onclick="addReaction('❤️')">❤️</button><button onclick="addReaction('😂')">😂</button>
+      <button onclick="addReaction('😮')">😮</button><button onclick="addReaction('😢')">😢</button>
+      <button onclick="addReaction('😡')">😡</button><button onclick="addReaction('👍')">👍</button>
+      <button onclick="addReaction('🎉')">🎉</button><button onclick="addReaction('🔥')">🔥</button>
+      <button onclick="addReaction('💯')">💯</button>
+    </div>
+  </div>
+</div>
+
+<!-- GIFT RAIN -->
+<div class="gift-rain" id="giftRain"></div>
+
+<!-- PARTICIPANTS -->
+<div class="participants-overlay" id="participantsOverlay" onclick="toggleParticipants()"></div>
+<div class="participants-panel" id="participantsPanel"><div style="display:flex; justify-content:space-between; padding-bottom:6px; border-bottom:1px solid var(--border-color);"><span>👥 Members</span><button onclick="toggleParticipants()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button></div><div id="participantsList"><div style="text-align:center; color:var(--text-muted); padding:16px 0; font-size:12px;">Loading…</div></div></div>
+
+<!-- PROFILE MODAL -->
+<div class="profile-modal-overlay" id="profileModalOverlay" onclick="closeProfileModal()">
+  <div class="profile-modal" id="profileModal" onclick="event.stopPropagation()"><div id="profileModalBody"></div></div>
+</div>
+
+<!-- GIFT SEND MODAL -->
+<div class="gift-send-overlay" id="giftSendOverlay" onclick="closeGiftSendModal()">
+  <div class="gift-send-modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between;"><span>🎁 Send Gift</span><button onclick="closeGiftSendModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button></div>
+    <div id="giftRecipientInfo" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); border:1px solid var(--border-color); border-radius:10px; padding:6px 10px; margin:8px 0;">👤 Select a user</div>
+    <div class="gift-grid" id="giftSendGrid"></div>
+    <div class="send-actions"><button class="btn-send-gift" id="giftSendBtn" onclick="sendGiftToUser()">💌 Send Gift</button><button class="btn-cancel" onclick="closeGiftSendModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- GIFTS PANEL -->
+<div class="gifts-panel-overlay" id="giftsPanelOverlay" onclick="closeGiftsPanel()">
+  <div class="gifts-panel" onclick="event.stopPropagation()"><div id="giftsListContainer">Loading…</div></div>
+</div>
+
+<!-- SEND COINS MODAL -->
+<div class="send-coins-overlay" id="sendCoinsOverlay" onclick="closeSendCoinsModal()">
+  <div class="send-coins-modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between;"><span>💸 Send Coins</span><button onclick="closeSendCoinsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button></div>
+    <div style="background:rgba(0,132,255,0.06); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; margin:8px 0; display:flex; justify-content:space-between;">Your balance <span>🪙 <span id="sendCoinsBalance">0</span></span></div>
+    <select id="sendCoinsRecipient" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; color:var(--text-primary); font-size:14px; font-family:var(--font); outline:none; min-height:40px; margin-bottom:8px;"></select>
+    <div class="amount-input"><input type="number" id="sendCoinsAmount" placeholder="Amount" min="1" value="1" /></div>
+    <div class="send-actions" style="display:flex; gap:8px; margin-top:4px;"><button class="btn-send-coins" onclick="sendCoinsFromModal()">💸 Send</button><button class="btn-cancel" onclick="closeSendCoinsModal()">Cancel</button></div>
+  </div>
+</div>
+
+<!-- CONTACT ADMIN -->
+<div class="contact-modal-overlay" id="contactModalOverlay" onclick="closeContactModal()">
+  <div class="contact-modal" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between;"><span>📞 Contact Admin</span><button onclick="closeContactModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button></div>
+    <div style="background:rgba(0,132,255,0.04); border:1px solid var(--border-color); border-radius:10px; padding:8px 12px; margin:8px 0;">📧 eletexjoeytex@gmail.com</div>
+    <div class="packages-grid" id="contactPackagesGrid"></div>
+    <div class="contact-actions" style="display:flex; gap:8px; margin-top:6px;"><button class="btn-whatsapp" onclick="sendWhatsAppMessage()">💬 WhatsApp</button><button onclick="closeContactModal()" style="background:rgba(255,255,255,0.04); color:var(--text-muted); border:1px solid var(--border-color); flex:0.4; padding:10px; border-radius:10px; font-weight:700; cursor:pointer;">Cancel</button></div>
+  </div>
+</div>
+
+<!-- PREMIUM PANEL -->
+<div class="premium-panel-overlay" id="premiumPanelOverlay" onclick="closePremiumPanel()">
+  <div class="premium-panel" onclick="event.stopPropagation()">
+    <div class="panel-head"><span>⭐ Premium Hub</span><button class="close-btn" onclick="closePremiumPanel()">✕</button></div>
+    <div id="premiumPanelBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast"><div class="toast-content"><div class="toast-icon-wrapper" id="toastIconWrapper"><span id="toastIcon">✓</span></div><div class="toast-body"><div class="toast-title" id="toastTitle">Success</div><div class="toast-message" id="toastMsg">Action completed</div></div><button class="toast-close" onclick="dismissToast()">✕</button><div class="toast-progress" id="toastProgress"></div></div></div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay"><div class="confirm-modal"><div class="icon" id="confirmIcon">⚠️</div><div class="title" id="confirmTitle">Are you sure?</div><div class="message" id="confirmMsg">This cannot be undone.</div><div class="actions"><button class="cancel" onclick="confirmCancel()">Cancel</button><button class="danger" id="confirmConfirm" onclick="confirmOk()">Confirm</button></div></div></div>
+
+<!-- USER MENU -->
+<div class="user-menu-overlay" id="userMenuOverlay" onclick="closeUserMenu()"></div>
+<div class="user-menu" id="userMenu"><button class="item" id="menuViewProfile">👤 View Profile</button><button class="item" id="menuSendCoins">💸 Send Coins</button><button class="item" id="menuPrivateMsg">💬 Private Message</button><button class="item" id="menuSendGift">🎁 Send Gift</button><button class="item" id="menuReport">🚩 Report</button><button class="item danger" id="menuKick" style="display:none;">👢 Kick</button><button class="item danger" id="menuMute" style="display:none;">🔇 Mute</button></div>
+
+<!-- ===== MAIN SCRIPT (module) ===== -->
+<script type="module">
+  // ============================================================
+  // FIREBASE IMPORTS & CONFIG
+  // ============================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, getDocs, query, orderBy, limit, onSnapshot, runTransaction, serverTimestamp, increment, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const CONFIG = { apiKey: "AIzaSyAm8ghbQ_lwJdNXEhWGos0eyi5wtvGuRR4", authDomain: "grazzy-9e736.firebaseapp.com", projectId: "grazzy-9e736", storageBucket: "grazzy-9e736.firebasestorage.app", messagingSenderId: "750326949170", appId: "1:750326949170:web:5d19744aafc8675918632b" };
+  const app = initializeApp(CONFIG);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ============================================================
+  // CONSTANTS
+  // ============================================================
+  const COSTS = { text:1, sticker:2, voice:3, image:5 };
+  const GIFT_EMOJIS = [{emoji:'❤️',cost:2},{emoji:'😊',cost:2},{emoji:'🔥',cost:5},{emoji:'🎉',cost:5},{emoji:'💎',cost:10},{emoji:'🌟',cost:20}];
+  const coinPackages = [{amount:10,price:0.09},{amount:25,price:0.19},{amount:50,price:0.39},{amount:100,price:0.79},{amount:250,price:1.99},{amount:500,price:3.99},{amount:1000,price:7.99}];
+  const stickers = { happy:['😊','😄','😂','🤣','🥰','😍','🤩','😎'], sad:['😢','😭','😥','😰','😩','🥺','😔','😞'], angry:['😡','😠','🤬','👿','😤','💢','🔥','💀'], animals:['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼'] };
+  const allStickers = Object.values(stickers).flat();
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  let currentUser=null, roomId=null, roomData=null, coinBalance=0, hasPaid=false, isVIP=false, isPremium=false, isElite=false, isModerator=false, isRoomOwner=false;
+  let messageUnsub=null, participantUnsub=null, toastTimeout=null, pendingConfirm=null, lastActivity=Date.now();
+  let achievements=[], selectedUserUid=null, replyingTo=null, searchMode=false, userSpId=null, giftRecipientUid=null, selectedGiftEmoji=null, giftBadgeCount=0, selectedPackage=null;
+  let notificationFeed = [];
+  const MAX_NOTIFICATIONS = 50;
+
+  // DOM refs
+  const container = document.getElementById('messagesContainer');
+  const msgInput = document.getElementById('msgInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const msgCostBadge = document.getElementById('msgCostBadge');
+  const coinEl = document.getElementById('headerCoins');
+  const roomNameEl = document.getElementById('roomName');
+  const memberCountEl = document.getElementById('memberCount');
+  const memberBadge = document.getElementById('memberBadge');
+  const roomFeeEl = document.getElementById('roomFee');
+  const vipTag = document.getElementById('vipTag');
+  const premiumTag = document.getElementById('premiumTag');
+  const eliteTag = document.getElementById('eliteTag');
+  const roomStatusDot = document.getElementById('roomStatusDot');
+  const roomStatusText = document.getElementById('roomStatusText');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const searchBar = document.getElementById('searchBar');
+  const searchInput = document.getElementById('searchInput');
+  const giftBadge = document.getElementById('giftBadge');
+  const moreDropdown = document.getElementById('moreDropdown');
+  const premiumPanelBody = document.getElementById('premiumPanelBody');
+  const premiumPanelOverlay = document.getElementById('premiumPanelOverlay');
+  const profileModalBody = document.getElementById('profileModalBody');
+  const profileModalOverlay = document.getElementById('profileModalOverlay');
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+  function showToast(msg, type='success', title='') {
+    const t = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    const iconWrapper = document.getElementById('toastIconWrapper');
+    const titleEl = document.getElementById('toastTitle');
+    const msgEl = document.getElementById('toastMsg');
+    const progress = document.getElementById('toastProgress');
+    if (toastTimeout) clearTimeout(toastTimeout);
+    t.className = 'toast-container';
+    iconWrapper.className = 'toast-icon-wrapper';
+    const types = { success:{icon:'✓',class:'success',progress:'success',title:'Success'}, error:{icon:'✕',class:'error',progress:'error',title:'Error'}, warning:{icon:'⚠️',class:'warning',progress:'warning',title:'Warning'}, info:{icon:'ℹ️',class:'info',progress:'info',title:'Info'}, premium:{icon:'⭐',class:'premium',progress:'premium',title:'Premium'}, elite:{icon:'🔥',class:'elite',progress:'elite',title:'ELITE'}, gold:{icon:'🏆',class:'gold',progress:'gold',title:'Gold'} };
+    const selected = types[type] || types.success;
+    icon.textContent = selected.icon;
+    iconWrapper.classList.add(selected.class);
+    titleEl.textContent = title || selected.title;
+    msgEl.textContent = msg;
+    progress.className = 'toast-progress ' + selected.progress;
+    void t.offsetWidth;
+    t.classList.add('active');
+    toastTimeout = setTimeout(() => { t.classList.add('removing'); setTimeout(()=>{ t.className='toast-container'; t.classList.remove('removing'); toastTimeout=null; },400); }, 3500);
+    addNotification(msg, type, title || selected.title);
+  }
+  window.dismissToast = function() { const t=document.getElementById('toast'); if(!t.classList.contains('active')) return; t.classList.add('removing'); setTimeout(()=>{ t.className='toast-container'; t.classList.remove('removing'); if(toastTimeout) clearTimeout(toastTimeout); },400); };
+
+  function addNotification(message, type='info', title='') {
+    notificationFeed.unshift({ id:Date.now()+'_'+Math.random().toString(36).substr(2,4), message, type, title:title||type.charAt(0).toUpperCase()+type.slice(1), timestamp:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), time:Date.now() });
+    if(notificationFeed.length > MAX_NOTIFICATIONS) notificationFeed = notificationFeed.slice(0, MAX_NOTIFICATIONS);
+    if(premiumPanelOverlay.classList.contains('open')) renderPremiumPanel();
+  }
+
+  // ============================================================
+  // CONFIRM
+  // ============================================================
+  function showConfirm(opts) { return new Promise(r=>{ const o=document.getElementById('confirmOverlay'); document.getElementById('confirmIcon').textContent=opts.icon||'⚠️'; document.getElementById('confirmTitle').textContent=opts.title||'Are you sure?'; document.getElementById('confirmMsg').textContent=opts.message||'This cannot be undone.'; document.getElementById('confirmConfirm').textContent=opts.confirmText||'Confirm'; document.getElementById('confirmConfirm').className=opts.confirmType||'danger'; pendingConfirm={resolve:r}; o.classList.add('active'); }); }
+  window.confirmOk = function(){ if(pendingConfirm){ pendingConfirm.resolve(true); pendingConfirm=null; } document.getElementById('confirmOverlay').classList.remove('active'); };
+  window.confirmCancel = function(){ if(pendingConfirm){ pendingConfirm.resolve(false); pendingConfirm=null; } document.getElementById('confirmOverlay').classList.remove('active'); };
+
+  // ============================================================
+  // COINS
+  // ============================================================
+  async function getCoins(uid){ try{ const s=await getDoc(doc(db,'users',uid)); return s.exists()?(s.data().coins||0):0; }catch{ return 0; } }
+  async function updateCoins(uid, amount, reason){ await runTransaction(db, async(tx)=>{ const ref=doc(db,'users',uid); const s=await tx.get(ref); const cur=s.exists()?(s.data().coins||0):0; if(cur+amount<0) throw new Error('Not enough coins'); tx.update(ref,{coins:cur+amount}); await tx.set(doc(collection(db,'transactions')),{ userId:uid, amount, newBalance:cur+amount, reason, timestamp:serverTimestamp() }); }); return true; }
+  async function deductCoinsIfPossible(amount, reason){ if(amount<=0) return true; if(coinBalance<amount){ showToast(`Insufficient coins! Need ${amount} 🪙`,'error'); return false; } try{ await updateCoins(currentUser.uid, -amount, reason); coinBalance = await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; return true; }catch(e){ showToast('Transaction failed: '+e.message,'error'); return false; } }
+
+  // ============================================================
+  // FIND USER
+  // ============================================================
+  async function findUserByIdentifier(identifier){ const q1=query(collection(db,'users'),where('spId','==',identifier)); const snap1=await getDocs(q1); if(!snap1.empty){ const docSnap=snap1.docs[0]; return {uid:docSnap.id, data:docSnap.data()}; } const docRef=doc(db,'users',identifier); const snap2=await getDoc(docRef); if(snap2.exists()) return {uid:identifier, data:snap2.data()}; return null; }
+
+  // ============================================================
+  // SEND COINS VIA SP
+  // ============================================================
+  async function sendCoinsViaSP(spId, amount){ if(!currentUser||!hasPaid){ showToast('You must be in the room.','warning'); return false; } if(amount<1||amount>coinBalance){ showToast(`Invalid amount. You have ${coinBalance} 🪙.`,'error'); return false; } const recipient=await findUserByIdentifier(spId); if(!recipient){ showToast(`User "${spId}" not found.`,'error'); return false; } if(recipient.uid===currentUser.uid){ showToast('Cannot send to yourself.','warning'); return false; } try{ await runTransaction(db, async(tx)=>{ const senderRef=doc(db,'users',currentUser.uid); const receiverRef=doc(db,'users',recipient.uid); const senderSnap=await tx.get(senderRef); const receiverSnap=await tx.get(receiverRef); const senderBal=senderSnap.exists()?(senderSnap.data().coins||0):0; const receiverBal=receiverSnap.exists()?(receiverSnap.data().coins||0):0; if(senderBal<amount) throw new Error('Insufficient'); tx.update(senderRef,{coins:senderBal-amount}); tx.update(receiverRef,{coins:receiverBal+amount}); await tx.set(doc(collection(db,'transactions')),{ userId:currentUser.uid, type:'send', toUid:recipient.uid, amount:-amount, newBalance:senderBal-amount, reason:`Sent ${amount} coins to ${recipient.data.name||recipient.uid}`, status:'completed', timestamp:serverTimestamp() }); await tx.set(doc(collection(db,'transactions')),{ userId:recipient.uid, type:'receive', fromUid:currentUser.uid, amount, newBalance:receiverBal+amount, reason:`Received ${amount} coins from ${currentUser.displayName||'User'}`, status:'completed', timestamp:serverTimestamp() }); }); coinBalance=await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; await addDoc(collection(db,'rooms',roomId,'messages'),{ senderId:'system', senderName:'SPIKE', text:`🪙 ${currentUser.displayName||'User'} sent ${amount} coins to ${recipient.data.name||recipient.uid}`, type:'system', timestamp:serverTimestamp() }); showToast(`✅ ${amount} coins sent!`,'success'); addNotification(`Sent ${amount}🪙 to ${recipient.data.name||recipient.uid}`,'success','Coins Sent'); return true; }catch(err){ showToast(err.message||'Failed','error'); return false; } }
+
+  // ============================================================
+  // GIFT FUNCTIONS
+  // ============================================================
+  window.openGiftSendModal = function(recipientUid=null){ if(!currentUser||!hasPaid){ showToast('Join the room first.','warning'); return; } selectedGiftEmoji=null; giftRecipientUid=recipientUid; const grid=document.getElementById('giftSendGrid'); grid.innerHTML=GIFT_EMOJIS.map((g,idx)=>`<button class="${selectedGiftEmoji===g.emoji?'selected':''}" data-emoji="${g.emoji}" data-cost="${g.cost}" onclick="selectGiftEmoji('${g.emoji}',${g.cost})">${g.emoji}<span class="gift-cost-popup">${g.cost}</span></button>`).join(''); const infoDiv=document.getElementById('giftRecipientInfo'); if(recipientUid){ loadRecipientInfo(recipientUid); }else{ infoDiv.innerHTML=`<div>👤 <input type="text" id="giftRecipientInput" placeholder="Enter SP ID or name" style="background:var(--bg-input);border:1px solid var(--border-color);border-radius:8px;padding:4px 8px;color:var(--text-primary);width:60%;"/><button onclick="findGiftRecipient()" style="background:var(--accent);border:none;border-radius:8px;padding:4px 10px;color:#fff;cursor:pointer;">Find</button></div>`; giftRecipientUid=null; } document.getElementById('giftSendOverlay').classList.add('open'); };
+  window.closeGiftSendModal = function(){ document.getElementById('giftSendOverlay').classList.remove('open'); giftRecipientUid=null; selectedGiftEmoji=null; };
+  async function loadRecipientInfo(uid){ try{ const docSnap=await getDoc(doc(db,'users',uid)); if(!docSnap.exists()){ showToast('User not found','error'); return; } const data=docSnap.data(); const name=data.name||data.displayName||'User'; const spId=data.spId||'N/A'; document.getElementById('giftRecipientInfo').innerHTML=`<div>👤 ${name} (SP: ${spId})</div>`; giftRecipientUid=uid; }catch(e){ showToast('Error loading recipient','error'); } }
+  window.findGiftRecipient = async function(){ const input=document.getElementById('giftRecipientInput'); if(!input) return; const q=input.value.trim(); if(!q){ showToast('Enter a name or SP ID','warning'); return; } const qSpId=query(collection(db,'users'),where('spId','==',q)); const snapSpId=await getDocs(qSpId); if(!snapSpId.empty){ await loadRecipientInfo(snapSpId.docs[0].id); return; } const qName=query(collection(db,'users'),where('name','>=',q),where('name','<=',q+'\uf8ff')); const snapName=await getDocs(qName); if(!snapName.empty){ await loadRecipientInfo(snapName.docs[0].id); return; } showToast('User not found','error'); };
+  window.selectGiftEmoji = function(emoji,cost){ selectedGiftEmoji=emoji; document.querySelectorAll('#giftSendGrid button').forEach(b=>b.classList.toggle('selected',b.dataset.emoji===emoji)); document.getElementById('giftSendBtn').textContent=`💌 Send ${emoji} (${cost}🪙)`; };
+  window.sendGiftToUser = async function(){ if(!currentUser||!hasPaid){ showToast('Join the room first.','warning'); return; } if(!giftRecipientUid){ showToast('Select a recipient first.','warning'); return; } if(!selectedGiftEmoji){ showToast('Select a gift emoji.','warning'); return; } const giftData=GIFT_EMOJIS.find(g=>g.emoji===selectedGiftEmoji); if(!giftData) return; const cost=giftData.cost; if(!await deductCoinsIfPossible(cost,`Send gift ${selectedGiftEmoji}`)) return; try{ const giftRef=doc(collection(db,'users',giftRecipientUid,'gifts')); await setDoc(giftRef,{ fromUid:currentUser.uid, fromName:currentUser.displayName||'User', emoji:selectedGiftEmoji, value:cost, timestamp:serverTimestamp(), converted:false }); const recipientName=document.getElementById('giftRecipientInfo')?.textContent||'user'; await addDoc(collection(db,'rooms',roomId,'messages'),{ senderId:'system', senderName:'SPIKE', text:`🎁 ${currentUser.displayName||'User'} sent a gift ${selectedGiftEmoji} to ${recipientName}!`, type:'system', timestamp:serverTimestamp() }); if(cost>=10) triggerGiftRain(selectedGiftEmoji, cost===20?40:20); showToast(`Gift ${selectedGiftEmoji} sent! -${cost}🪙`,'success'); addNotification(`Sent ${selectedGiftEmoji} gift`,'gold','Gift Sent'); closeGiftSendModal(); loadGiftBadgeCount(); }catch(err){ showToast('Failed to send gift: '+err.message,'error'); } };
+  function triggerGiftRain(emoji, count=20){ const c=document.getElementById('giftRain'); for(let i=0;i<count;i++){ const el=document.createElement('div'); el.className='drop'; el.textContent=emoji; el.style.left=Math.random()*100+'%'; el.style.fontSize=(22+Math.random()*30)+'px'; el.style.animationDuration=(2+Math.random()*3)+'s'; el.style.animationDelay=(Math.random()*1.5)+'s'; c.appendChild(el); setTimeout(()=>el.remove(),6000); } }
+
+  // ============================================================
+  // GIFTS PANEL
+  // ============================================================
+  window.openGiftsPanel = function(){ if(!currentUser){ showToast('Sign in first.','warning'); return; } document.getElementById('giftsPanelOverlay').classList.add('open'); loadGifts(); };
+  window.closeGiftsPanel = function(){ document.getElementById('giftsPanelOverlay').classList.remove('open'); };
+  async function loadGifts(){ const el=document.getElementById('giftsListContainer'); el.innerHTML='Loading…'; try{ const q=query(collection(db,'users',currentUser.uid,'gifts'),orderBy('timestamp','desc')); const snap=await getDocs(q); if(snap.empty){ el.innerHTML='<div style="text-align:center;padding:24px 0;color:var(--text-muted);">No gifts yet. 🌟</div>'; return; } let html=''; let unconverted=0; snap.forEach(d=>{ const data=d.data(); const id=d.id; const converted=data.converted===true; if(!converted) unconverted++; html+=`<div class="gift-item"><div class="gift-emoji">${data.emoji}</div><div class="gift-info">from ${data.fromName||'Unknown'} (🪙${data.value})</div><div class="gift-actions">${converted?'<button disabled>✓ Converted</button>':`<button class="convert" onclick="convertGift('${id}')">Convert</button>`}</div></div>`; }); el.innerHTML=html; giftBadgeCount=unconverted; updateGiftBadge(); }catch(e){ el.innerHTML='Failed to load gifts.'; } }
+  function updateGiftBadge(){ const show=giftBadgeCount>0; const text=giftBadgeCount>9?'9+':giftBadgeCount; giftBadge.textContent=text; giftBadge.style.display=show?'flex':'none'; }
+  window.convertGift = async function(giftId){ if(!currentUser) return; const ok=await showConfirm({icon:'🪙', title:'Convert Gift', message:'Convert this gift to coins?', confirmText:'Convert', confirmType:'primary'}); if(!ok) return; try{ const ref=doc(db,'users',currentUser.uid,'gifts',giftId); const snap=await getDoc(ref); if(!snap.exists()){ showToast('Gift not found.','error'); return; } const data=snap.data(); if(data.converted){ showToast('Already converted.','warning'); return; } await updateCoins(currentUser.uid, data.value||0, `Converted gift ${data.emoji}`); await updateDoc(ref,{converted:true}); coinBalance=await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; showToast(`+${data.value}🪙`,'success'); loadGifts(); }catch(e){ showToast('Failed: '+e.message,'error'); } };
+  async function loadGiftBadgeCount(){ if(!currentUser) return; try{ const q=query(collection(db,'users',currentUser.uid,'gifts'),where('converted','==',false)); const snap=await getDocs(q); giftBadgeCount=snap.size; updateGiftBadge(); }catch(e){} }
+
+  // ============================================================
+  // CONTACT ADMIN
+  // ============================================================
+  window.openContactModal = function(){ const grid=document.getElementById('contactPackagesGrid'); grid.innerHTML=coinPackages.map((pkg,idx)=>`<button class="pkg-btn" data-index="${idx}" onclick="selectCoinPackage(${idx})"><span class="pkg-amount">${pkg.amount}</span><span class="pkg-price">$${pkg.price}</span></button>`).join(''); selectedPackage=null; document.getElementById('contactModalOverlay').classList.add('open'); };
+  window.closeContactModal = function(){ document.getElementById('contactModalOverlay').classList.remove('open'); selectedPackage=null; };
+  window.selectCoinPackage = function(idx){ document.querySelectorAll('.pkg-btn').forEach(b=>b.classList.remove('selected')); document.querySelector(`.pkg-btn[data-index="${idx}"]`).classList.add('selected'); selectedPackage=coinPackages[idx]; };
+  window.sendWhatsAppMessage = function(){ if(!selectedPackage){ showToast('Select a package first.','warning'); return; } if(!userSpId){ showToast('Set your SPIKE ID in profile first.','error'); return; } const name=currentUser.displayName||'User'; const spId=userSpId; const amount=selectedPackage.amount; const price=selectedPackage.price; const phone='2349159096952'; const msg=`Hi, I am ${name}, SP ID: ${spId}. I want to buy ${amount} coins for $${price}.`; window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank'); closeContactModal(); };
+
+  // ============================================================
+  // PREMIUM PANEL
+  // ============================================================
+  window.openPremiumPanel = function(){ renderPremiumPanel(); premiumPanelOverlay.classList.add('open'); };
+  window.closePremiumPanel = function(){ premiumPanelOverlay.classList.remove('open'); };
+  function renderPremiumPanel(){ let tier='Free', tierClass='free', tierIcon='🆓', tierDesc='Join VIP, Premium or ELITE.'; if(isElite){ tier='ELITE'; tierClass='elite'; tierIcon='🔥'; tierDesc='Full access!'; } else if(isPremium){ tier='Premium'; tierClass='premium'; tierIcon='⭐'; tierDesc='Premium features.'; } else if(isVIP){ tier='VIP'; tierClass='vip'; tierIcon='👑'; tierDesc='VIP features.'; }
+    const features=[{id:'stickers',label:'Stickers',icon:'😊',tier:'VIP',available:()=>isVIP||isPremium||isElite,cost:2},{id:'voice_notes',label:'Voice Notes',icon:'🎤',tier:'Premium',available:()=>isPremium||isElite,cost:3},{id:'image_sharing',label:'Image Sharing',icon:'🖼️',tier:'ELITE',available:()=>isElite,cost:5}];
+    let featureHTML=''; features.forEach(f=>{ const avail=f.available(); featureHTML+=`<div class="feature-item"><span>${f.icon}</span><div>${f.label}</div><span class="f-status ${avail?'unlocked':'locked'}">${avail?'✅':'🔒'}</span></div>`; });
+    let upgradeHTML=''; if(!isVIP) upgradeHTML+=`<button class="vip-upgrade" onclick="buyVIP()">👑 VIP 200</button>`; if(!isPremium) upgradeHTML+=`<button class="premium-upgrade" onclick="upgradeToPremium()" ${isVIP?'':'disabled'}>⭐ Premium 500 ${!isVIP?'(need VIP)':''}</button>`; if(!isElite) upgradeHTML+=`<button class="elite-upgrade" onclick="upgradeToElite()" ${isPremium?'':'disabled'}>🔥 Elite 1000 ${!isPremium?'(need Premium)':''}</button>`; if(isVIP&&isPremium&&isElite) upgradeHTML=`<button style="flex:1;background:var(--success);color:#fff;opacity:0.7;" disabled>🏆 Max Tier</button>`;
+    let notifHTML=''; if(notificationFeed.length===0) notifHTML='<div style="text-align:center;color:var(--text-muted);font-size:0.7rem;padding:12px 0;">No notifications</div>'; else notifHTML=notificationFeed.slice(0,20).map(n=>`<div class="notif-item ${n.type}">${n.message} <span style="font-size:0.55rem;color:var(--text-muted);">${n.timestamp}</span></div>`).join('');
+    premiumPanelBody.innerHTML=`<div>${tierIcon} ${tier} — ${tierDesc}</div><div class="feature-grid">${featureHTML}</div><div class="upgrade-buttons">${upgradeHTML}</div><div class="notif-feed">${notifHTML}</div>`;
+  }
+  window.upgradeToPremium = async function(){ if(!hasPaid||!currentUser||isPremium) return; if(!isVIP){ showToast('Need VIP first (200🪙).','warning'); return; } const cost=500; try{ await updateCoins(currentUser.uid,-cost,'Premium upgrade'); await updateDoc(doc(db,'rooms',roomId,'participants',currentUser.uid),{premium:true}); isPremium=true; coinBalance=await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; showToast('⭐ You are now Premium!','premium','Premium'); addNotification('Upgraded to Premium ⭐','premium','Upgrade'); await addDoc(collection(db,'rooms',roomId,'messages'),{ senderId:'system', senderName:'SPIKE', text:`${currentUser.displayName||'User'} became Premium ⭐`, type:'system', timestamp:serverTimestamp() }); updateTierLocks(); closePremiumPanel(); renderPremiumPanel(); }catch(err){ showToast('Not enough coins (need 500 🪙)','error'); } };
+  window.upgradeToElite = async function(){ if(!hasPaid||!currentUser||isElite) return; if(!isPremium){ showToast('Need Premium first (500🪙).','warning'); return; } const cost=1000; try{ await updateCoins(currentUser.uid,-cost,'ELITE upgrade'); await updateDoc(doc(db,'rooms',roomId,'participants',currentUser.uid),{elite:true}); isElite=true; coinBalance=await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; showToast('🔥 You are ELITE!','elite','ELITE'); addNotification('Upgraded to ELITE 🔥','elite','Upgrade'); await addDoc(collection(db,'rooms',roomId,'messages'),{ senderId:'system', senderName:'SPIKE', text:`${currentUser.displayName||'User'} became ELITE 🔥!`, type:'system', timestamp:serverTimestamp() }); triggerGiftRain('🔥',40); updateTierLocks(); closePremiumPanel(); renderPremiumPanel(); }catch(err){ showToast('Not enough coins (need 1000 🪙)','error'); } };
+  window.buyVIP = async function(){ if(!hasPaid||!currentUser||isVIP) return; const cost=200; try{ await updateCoins(currentUser.uid,-cost,'VIP'); await updateDoc(doc(db,'rooms',roomId,'participants',currentUser.uid),{vip:true}); isVIP=true; coinBalance=await getCoins(currentUser.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; showToast('👑 You are VIP!','gold'); addNotification('Upgraded to VIP 👑','gold','Upgrade'); await addDoc(collection(db,'rooms',roomId,'messages'),{ senderId:'system', senderName:'SPIKE', text:`${currentUser.displayName||'User'} became VIP 👑`, type:'system', timestamp:serverTimestamp() }); updateTierLocks(); closePremiumPanel(); renderPremiumPanel(); }catch(err){ showToast('Not enough coins (need 200 🪙)','error'); } };
+
+  function updateTierLocks(){ const vip=isVIP||isPremium||isElite; const premium=isPremium||isElite; const elite=isElite; document.getElementById('stickerLock').style.display=vip?'none':'flex'; document.getElementById('voiceLock').style.display=premium?'none':'flex'; document.getElementById('imageLock').style.display=elite?'none':'flex'; msgCostBadge.textContent=COSTS.text; document.getElementById('typingCostBadge').textContent=COSTS.text; vipTag.classList.toggle('show',isVIP); premiumTag.classList.toggle('show',isPremium); eliteTag.classList.toggle('show',isElite); }
+
+  // ============================================================
+  // SEND COINS MODAL
+  // ============================================================
+  window.openSendCoinsModal = function(){ if(!currentUser||!hasPaid){ showToast('Join the room first.','warning'); return; } document.getElementById('sendCoinsBalance').textContent=coinBalance; populateRecipientSelect(); document.getElementById('sendCoinsOverlay').classList.add('open'); };
+  window.closeSendCoinsModal = function(){ document.getElementById('sendCoinsOverlay').classList.remove('open'); };
+  async function populateRecipientSelect(){ const sel=document.getElementById('sendCoinsRecipient'); sel.innerHTML='<option value="">— Select —</option>'; try{ const snap=await getDocs(collection(db,'rooms',roomId,'participants')); const uids=[]; snap.forEach(d=>uids.push(d.id)); for(const uid of uids){ if(uid===currentUser.uid) continue; try{ const s=await getDoc(doc(db,'users',uid)); if(s.exists()){ const data=s.data(); const name=data.name||data.displayName||'User'; const spId=data.spId||'N/A'; const opt=document.createElement('option'); opt.value=uid; opt.textContent=`${name} (SP:${spId})`; opt.dataset.spid=spId; sel.appendChild(opt); } }catch(e){} } }catch(e){ console.error(e); } }
+  window.sendCoinsFromModal = async function(){ const sel=document.getElementById('sendCoinsRecipient'); const uid=sel.value; const amount=parseInt(document.getElementById('sendCoinsAmount').value); if(!uid){ showToast('Select a recipient.','warning'); return; } if(!amount||amount<1){ showToast('Enter a valid amount.','warning'); return; } if(amount>coinBalance){ showToast(`You have ${coinBalance} 🪙.`,'error'); return; } const opt=sel.options[sel.selectedIndex]; const spId=opt?.dataset?.spid; if(!spId){ showToast('Recipient has no SPIKE ID.','error'); return; } const success=await sendCoinsViaSP(spId, amount); if(success) closeSendCoinsModal(); };
+
+  // ============================================================
+  // VOICE RECORDER — FIXED PLAYBACK
+  // ============================================================
+  let mediaRecorder=null, audioChunks=[], isRecording=false;
+  // Store audio blobs temporarily for playback
+  let voiceAudioCache = {};
+
+  window.toggleVoiceRecorder = function(){ if(!isPremium&&!isElite){ showToast('Upgrade to Premium for voice notes (3🪙).','warning','Voice Locked'); return; } if(isRecording){ stopRecording(); }else{ startRecording(); } };
+  async function startRecording(){ try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); audioChunks=[]; mediaRecorder.ondataavailable=event=>{ if(event.data.size>0) audioChunks.push(event.data); }; mediaRecorder.onstop=async ()=>{ const audioBlob=new Blob(audioChunks,{type:'audio/webm'}); if(audioBlob.size>0){ // Convert to base64 for storage and playback
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+              const base64Data = e.target.result;
+              // Send as base64 with a marker
+              await sendMessageWithType('voice', base64Data, COSTS.voice);
+              showToast('Voice note sent -3🪙','success');
+              addNotification('Voice note sent','info','Voice');
+            };
+            reader.readAsDataURL(audioBlob);
+          } stream.getTracks().forEach(t=>t.stop()); isRecording=false; }; mediaRecorder.start(); isRecording=true; showToast('Recording… tap again to stop','info'); }catch(e){ showToast('Could not access microphone','error'); } }
+  function stopRecording(){ if(mediaRecorder&&isRecording){ mediaRecorder.stop(); isRecording=false; } }
+
+  // Improved voice playback: decodes base64 data-URL and plays
+  window.playVoiceNote = function(audioDataUrl) {
+    if (!audioDataUrl || typeof audioDataUrl !== 'string') {
+      showToast('No audio data available.','error');
+      return;
+    }
+    try {
+      // audioDataUrl is a data:audio/webm;base64,... string
+      const audio = new Audio(audioDataUrl);
+      audio.play().catch(err => {
+        console.error('Playback error:', err);
+        showToast('Could not play voice note.','error');
+      });
+    } catch (e) {
+      console.error('Playback error:', e);
+      showToast('Could not play voice note.','error');
+    }
+  };
+
+  // ============================================================
+  // IMAGE SHARING
+  // ============================================================
+  window.triggerImageUpload = function(){ if(!isElite){ showToast('Upgrade to Elite for images (5🪙).','warning','Image Locked'); return; } document.getElementById('imageInput').click(); };
+  window.handleImageUpload = async function(event){ const file=event.target.files[0]; if(!file) return; if(!isElite){ showToast('Upgrade to Elite.','warning'); return; } if(!file.type.startsWith('image/')){ showToast('Not an image.','error'); return; } if(file.size>5*1024*1024){ showToast('Max 5MB.','error'); return; } const reader=new FileReader(); reader.onload=async function(e){ await sendMessageWithType('image',e.target.result,COSTS.image); showToast('Image sent -5🪙','success'); addNotification('Image shared','info','Image'); }; reader.readAsDataURL(file); document.getElementById('imageInput').value=''; };
+
+  // ============================================================
+  // STICKER
+  // ============================================================
+  window.toggleStickerPicker = function(){ if(!isVIP&&!isPremium&&!isElite){ showToast('Upgrade to VIP for stickers (2🪙)','warning','Stickers Locked'); return; } const overlay=document.getElementById('stickerPickerOverlay'); overlay.classList.toggle('open'); if(overlay.classList.contains('open')) renderStickers('happy'); };
+  window.closeStickerPicker = function(){ document.getElementById('stickerPickerOverlay').classList.remove('open'); };
+  function renderStickers(category){ const grid=document.getElementById('stickerGrid'); let emojis=category==='happy'?stickers.happy:category==='sad'?stickers.sad:category==='angry'?stickers.angry:category==='animals'?stickers.animals:allStickers; grid.innerHTML=emojis.map(e=>`<button onclick="sendSticker('${e}')">${e}</button>`).join(''); }
+  window.sendSticker = function(emoji){ if(!isVIP&&!isPremium&&!isElite){ showToast('Upgrade to VIP.','warning'); return; } closeStickerPicker(); sendMessageWithType('sticker',emoji,COSTS.sticker); };
+
+  // ============================================================
+  // REACTION
+  // ============================================================
+  let reactionTargetId=null;
+  window.openReactionPicker = function(messageId){ reactionTargetId=messageId; document.getElementById('reactionPickerOverlay').classList.add('open'); };
+  window.closeReactionPicker = function(){ document.getElementById('reactionPickerOverlay').classList.remove('open'); reactionTargetId=null; };
+  window.addReaction = async function(emoji){ if(!reactionTargetId||!currentUser) return; const ref=doc(db,'rooms',roomId,'messages',reactionTargetId); try{ const snap=await getDoc(ref); if(!snap.exists()) return; const data=snap.data(); const reactions=data.reactions||{}; const users=reactions[emoji]||[]; const idx=users.indexOf(currentUser.uid); if(idx>-1) users.splice(idx,1); else users.push(currentUser.uid); reactions[emoji]=users; await updateDoc(ref,{reactions}); closeReactionPicker(); }catch(e){ console.error(e); } };
+
+  // ============================================================
+  // SEND MESSAGE CORE
+  // ============================================================
+  window.sendMessage = async function(){ const text=msgInput.value.trim(); if(!text||!hasPaid||!currentUser) return; const match=text.match(/^SP:([^/]+)\/(\d+)$/); if(match){ const spId=match[1].trim(); const amount=parseInt(match[2]); if(amount>0){ const success=await sendCoinsViaSP(spId, amount); if(success){ msgInput.value=''; msgInput.focus(); } return; }else{ showToast('Amount must be positive.','warning'); return; } } if(!await deductCoinsIfPossible(COSTS.text,'Text message')) return; sendBtn.disabled=true; try{ const msgData={ senderId:currentUser.uid, senderName:currentUser.displayName||'User', text, type:'text', isVIP, isPremium, isElite, isMod:isModerator, achievements:achievements.slice(0,2), timestamp:serverTimestamp(), reactions:{} }; if(replyingTo){ msgData.replyTo=replyingTo; replyingTo=null; } await addDoc(collection(db,'rooms',roomId,'messages'),msgData); msgInput.value=''; msgInput.focus(); lastActivity=Date.now(); }catch(err){ showToast('Failed to send','error'); } sendBtn.disabled=false; };
+
+  async function sendMessageWithType(type, content, cost=0){ if(!hasPaid||!currentUser) return; if(cost>0&&!await deductCoinsIfPossible(cost,`${type} message`)) return; sendBtn.disabled=true; try{ const msgData={ senderId:currentUser.uid, senderName:currentUser.displayName||'User', text:content, type, isVIP, isPremium, isElite, isMod:isModerator, achievements:achievements.slice(0,2), timestamp:serverTimestamp(), reactions:{} }; if(replyingTo){ msgData.replyTo=replyingTo; replyingTo=null; } await addDoc(collection(db,'rooms',roomId,'messages'),msgData); lastActivity=Date.now(); }catch(err){ showToast('Failed to send','error'); } sendBtn.disabled=false; }
+
+  // ============================================================
+  // MESSAGE ACTIONS
+  // ============================================================
+  window.editMessage = async function(id){ if(!currentUser) return; const ref=doc(db,'rooms',roomId,'messages',id); const snap=await getDoc(ref); if(!snap.exists()) return; const data=snap.data(); if(data.senderId!==currentUser.uid){ showToast('Not your message.','error'); return; } const msgTime=data.timestamp?.toDate?.()||new Date(); if(Date.now()-msgTime.getTime()>300000){ showToast('Edit window expired (5 min)','warning'); return; } const newText=prompt('Edit:', data.text); if(newText===null||newText.trim()==='') return; await updateDoc(ref,{text:newText.trim(), edited:true, editedAt:serverTimestamp()}); showToast('Updated','success'); };
+  window.deleteMessage = async function(id){ if(!currentUser) return; const ref=doc(db,'rooms',roomId,'messages',id); const snap=await getDoc(ref); if(!snap.exists()) return; const data=snap.data(); if(data.senderId!==currentUser.uid&&!isModerator&&!isRoomOwner){ showToast('Not allowed','error'); return; } if(data.senderId===currentUser.uid){ const t=data.timestamp?.toDate?.()||new Date(); if(Date.now()-t.getTime()>300000&&!isModerator&&!isRoomOwner){ showToast('Delete window expired','warning'); return; } } const ok=await showConfirm({icon:'🗑️', title:'Delete?', message:'This cannot be undone.', confirmText:'Delete', confirmType:'danger'}); if(!ok) return; await deleteDoc(ref); showToast('Deleted','success'); };
+  window.replyToMessage = function(id){ replyingTo=id; msgInput.focus(); msgInput.placeholder='Reply to message…'; showToast('Reply mode active.','info'); };
+  window.cancelReply = function(){ replyingTo=null; msgInput.placeholder='Type a message… (1🪙)'; };
+  window.pinMessage = async function(id){ if(!isElite&&!isModerator&&!isRoomOwner){ showToast('Upgrade to Elite to pin.','warning'); return; } const ref=doc(db,'rooms',roomId,'messages',id); const snap=await getDoc(ref); if(!snap.exists()) return; await updateDoc(ref,{pinned:true}); showToast('Pinned!','success'); };
+  window.unpinMessage = async function(id){ if(!isModerator&&!isRoomOwner&&!isElite){ showToast('Not allowed.','error'); return; } await updateDoc(doc(db,'rooms',roomId,'messages',id),{pinned:false}); showToast('Unpinned','success'); };
+
+  // ============================================================
+  // BUILD MESSAGE HTML
+  // ============================================================
+  function buildMessageHTML(data, isSelf){ const time=data.timestamp?.toDate?data.timestamp.toDate():new Date(); const timeStr=time.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); if(data.type==='system') return `<div class="system-msg">${data.text}</div>`;
+    let senderName=data.senderName||'User'; let crown=data.isVIP?'<span class="crown">👑</span>':''; let premiumBadge=data.isPremium?'<span class="premium-badge-sender">⭐</span>':''; let eliteBadge=data.isElite?'<span class="elite-badge-sender">🔥</span>':''; let modTag=data.isMod?'<span class="mod-tag">MOD</span>':''; let content='';
+    if(data.type==='sticker'){ content=`<div class="sticker">${data.text}</div>`; }else if(data.type==='image'){ content=`<img src="${data.text}" class="msg-image" onclick="window.open('${data.text}','_blank')" loading="lazy">`; }else if(data.type==='voice'){ // data.text is base64 data URL
+      content=`<div class="voice-msg"><button onclick="playVoiceNote('${data.text}')">▶</button><div class="wave"><div class="fill" style="width:70%;"></div></div><span class="duration">0:30</span></div>`; }else{ let text=String(data.text||''); text=text.replace(/@(\w+)/g,'<span class="mention">@$1</span>'); content=`<div class="text">${text}</div>`; }
+    let reactionsHTML=''; const reactions=data.reactions||{}; Object.keys(reactions).forEach(emoji=>{ const users=reactions[emoji]||[]; const active=currentUser&&users.includes(currentUser.uid); reactionsHTML+=`<span class="reaction ${active?'active':''}" onclick="addReactionToMessage('${data.id}','${emoji}')">${emoji} <span class="r-count">${users.length}</span></span>`; }); if(reactionsHTML) reactionsHTML=`<div class="reactions">${reactionsHTML}</div>`;
+    let actionsHTML=`<div class="msg-actions"><button onclick="replyToMessage('${data.id}')">↩️</button><button onclick="openReactionPicker('${data.id}')">😊</button>`; if(isSelf) actionsHTML+=`<button onclick="editMessage('${data.id}')">✏️</button>`; if(isSelf||isModerator||isRoomOwner) actionsHTML+=`<button class="danger" onclick="deleteMessage('${data.id}')">🗑️</button>`; if(isModerator||isRoomOwner||(isElite&&isSelf)){ if(data.pinned) actionsHTML+=`<button onclick="unpinMessage('${data.id}')">📌 Unpin</button>`; else actionsHTML+=`<button onclick="pinMessage('${data.id}')">📌 Pin</button>`; } actionsHTML+=`</div>`;
+    return `<div class="msg ${isSelf?'self':'other'}" id="msg-${data.id}"><div class="sender">${crown}${premiumBadge}${eliteBadge}${senderName}${modTag}</div>${content}${reactionsHTML}<div class="time">${timeStr} ${data.edited?'✎':''} ${actionsHTML}</div></div>`;
+  }
+
+  window.addReactionToMessage = async function(messageId, emoji){ if(!currentUser) return; const ref=doc(db,'rooms',roomId,'messages',messageId); try{ const snap=await getDoc(ref); if(!snap.exists()) return; const data=snap.data(); const reactions=data.reactions||{}; const users=reactions[emoji]||[]; const idx=users.indexOf(currentUser.uid); if(idx>-1) users.splice(idx,1); else users.push(currentUser.uid); reactions[emoji]=users; await updateDoc(ref,{reactions}); }catch(e){ console.error(e); } };
+
+  // ============================================================
+  // RENDER MESSAGES
+  // ============================================================
+  function renderMessages(snapshot){ if(searchMode&&searchInput.value.trim()){ performSearch(searchInput.value); return; } let html=''; const msgs=[]; snapshot.forEach(d=>msgs.push({id:d.id,...d.data()})); if(!msgs.length){ container.innerHTML='<div class="empty-state"><span class="icon">💬</span>No messages yet.<br />Say hello!</div>'; return; } msgs.sort((a,b)=>{ const ta=a.timestamp?.toDate? a.timestamp.toDate():new Date(0); const tb=b.timestamp?.toDate? b.timestamp.toDate():new Date(0); return ta-tb; }); for(const data of msgs){ const isSelf=data.senderId===currentUser?.uid; html+=buildMessageHTML(data,isSelf); } container.innerHTML=html; container.scrollTop=container.scrollHeight; }
+
+  // ============================================================
+  // SEARCH
+  // ============================================================
+  window.toggleSearch = function(){ searchMode=!searchMode; searchBar.classList.toggle('open',searchMode); if(searchMode) searchInput.focus(); else{ searchInput.value=''; if(container._lastSnapshot) renderMessages(container._lastSnapshot); } };
+  window.performSearch = function(query){ if(!query.trim()){ if(container._lastSnapshot) renderMessages(container._lastSnapshot); return; } const q=query.toLowerCase(); const msgs=[]; if(container._lastSnapshot){ container._lastSnapshot.forEach(d=>{ const data=d.data(); if(data.text&&data.text.toLowerCase().includes(q)) msgs.push({id:d.id,...data}); }); } if(!msgs.length){ container.innerHTML=`<div class="empty-state"><span class="icon">🔍</span>No messages found for "${query}"</div>`; return; } let html=''; msgs.forEach(data=>{ html+=buildMessageHTML(data,data.senderId===currentUser?.uid); }); container.innerHTML=html; };
+
+  // ============================================================
+  // PARTICIPANTS
+  // ============================================================
+  window.toggleParticipants = function(){ document.getElementById('participantsPanel').classList.toggle('open'); document.getElementById('participantsOverlay').classList.toggle('open'); if(document.getElementById('participantsPanel').classList.contains('open')) loadParticipants(); };
+  async function loadParticipants(){ const list=document.getElementById('participantsList'); try{ const snap=await getDocs(collection(db,'rooms',roomId,'participants')); if(snap.empty){ list.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:16px 0;">No one here</div>'; return; } let html=''; const uids=[]; snap.forEach(d=>uids.push({uid:d.id,data:d.data()})); for(const {uid,data} of uids){ let name='User', avatar='', online=false; try{ const s=await getDoc(doc(db,'users',uid)); if(s.exists()){ const d=s.data(); name=d.name||d.displayName||'User'; avatar=d.avatar||''; online=d.onlineStatus===true; } }catch(e){} const isSelf=uid===currentUser?.uid; html+=`<div class="participant" data-uid="${uid}" onclick="showUserMenu('${uid}', event)"><div class="info"><div class="name">${name}${isSelf?' (you)':''}</div></div></div>`; } list.innerHTML=html||'<div>No one</div>'; memberCountEl.textContent=uids.length; memberBadge.textContent=uids.length; }catch(e){ list.innerHTML='Failed to load'; } }
+
+  // ============================================================
+  // PROFILE MODAL
+  // ============================================================
+  window.openProfileModal = async function(uid){ if(uid===currentUser?.uid){ window.location.href='profile.html'; return; } closeProfileModal(); profileModalOverlay.classList.add('open'); profileModalBody.innerHTML='Loading…'; try{ const docSnap=await getDoc(doc(db,'users',uid)); if(!docSnap.exists()){ profileModalBody.innerHTML='User not found'; return; } const data=docSnap.data(); const name=data.name||data.displayName||'User'; const spId=data.spId||'N/A'; profileModalBody.innerHTML=`<div class="profile-avatar">${name.charAt(0).toUpperCase()}</div><div class="profile-name">${name}</div><div class="profile-spid">SP ID: ${spId}</div><div class="profile-actions"><button class="btn-send-coins" onclick="sendSignalCoins('${uid}', 10)">💸 Send 10 coins</button><button class="btn-send-gift" onclick="openGiftSendModal('${uid}')">🎁 Gift</button><button class="btn-message" onclick="window.location.href='chat.html?uid=${uid}'">💬 Message</button><button class="btn-close" onclick="closeProfileModal()">Close</button></div>`; }catch(e){ profileModalBody.innerHTML='Failed to load'; } };
+  window.closeProfileModal = function(){ profileModalOverlay.classList.remove('open'); profileModalBody.innerHTML=''; };
+  window.sendSignalCoins = async function(uid, amount){ if(!currentUser||amount>coinBalance){ showToast('Not enough coins.','error'); return; } const docSnap=await getDoc(doc(db,'users',uid)); if(!docSnap.exists()){ showToast('User not found.','error'); return; } const spId=docSnap.data().spId; if(!spId){ showToast('No SP ID.','error'); return; } await sendCoinsViaSP(spId, amount); closeProfileModal(); };
+
+  // ============================================================
+  // USER MENU
+  // ============================================================
+  window.showUserMenu = function(uid, event){ event.stopPropagation(); selectedUserUid=uid; const menu=document.getElementById('userMenu'); const overlay=document.getElementById('userMenuOverlay'); const x=event.clientX||0; const y=event.clientY||0; menu.style.left=Math.min(x, window.innerWidth-170)+'px'; menu.style.top=Math.min(y, window.innerHeight-200)+'px'; menu.style.display='block'; overlay.classList.add('active'); document.getElementById('menuViewProfile').onclick=()=>{ closeUserMenu(); window.openProfileModal(uid); }; document.getElementById('menuSendCoins').onclick=()=>{ closeUserMenu(); openSendCoinsModal(); }; document.getElementById('menuPrivateMsg').onclick=()=>{ closeUserMenu(); window.location.href=`chat.html?uid=${uid}`; }; document.getElementById('menuSendGift').onclick=()=>{ closeUserMenu(); window.openGiftSendModal(uid); }; document.getElementById('menuReport').onclick=()=>{ closeUserMenu(); reportUser(uid); }; document.getElementById('menuKick').onclick=()=>{ closeUserMenu(); kickUserByUid(uid); }; document.getElementById('menuMute').onclick=()=>{ closeUserMenu(); muteUser(uid); }; };
+  window.closeUserMenu = function(){ document.getElementById('userMenu').style.display='none'; document.getElementById('userMenuOverlay').classList.remove('active'); selectedUserUid=null; };
+  async function reportUser(uid){ const reason=prompt('Reason?'); if(!reason) return; await addDoc(collection(db,'reports'),{ reportedUid:uid, reportedBy:currentUser.uid, reason, status:'pending', createdAt:serverTimestamp() }); showToast('🚩 Report submitted','info'); }
+  async function kickUserByUid(uid){ if(!isModerator&&!isRoomOwner){ showToast('Not allowed.','error'); return; } const ok=await showConfirm({icon:'👢', title:'Kick User?', message:'Remove this user?', confirmText:'Kick', confirmType:'danger'}); if(!ok) return; await deleteDoc(doc(db,'rooms',roomId,'participants',uid)); await updateDoc(doc(db,'rooms',roomId),{participantCount:increment(-1)}); showToast('User kicked','warning'); }
+  async function muteUser(uid){ if(!isModerator&&!isRoomOwner){ showToast('Not allowed.','error'); return; } await updateDoc(doc(db,'rooms',roomId,'participants',uid),{muted:true}); showToast('User muted','warning'); }
+
+  // ============================================================
+  // MISC
+  // ============================================================
+  window.insertMention = function(){ const input=msgInput; const pos=input.selectionStart; input.value=input.value.substring(0,pos)+'@'+input.value.substring(pos); input.focus(); input.setSelectionRange(pos+1,pos+1); };
+  window.toggleMoreDropdown = function(){ moreDropdown.classList.toggle('open'); };
+  window.closeMoreDropdown = function(){ moreDropdown.classList.remove('open'); };
+  // Typing overlay
+  let isTypingOverlayOpen=false;
+  function openTypingOverlay(){ if(isTypingOverlayOpen) return; isTypingOverlayOpen=true; document.getElementById('typingTextarea').value=msgInput.value; document.getElementById('typingOverlay').style.display='flex'; document.getElementById('bottomInputArea').style.display='none'; document.body.style.overflow='hidden'; document.getElementById('typingCostBadge').textContent=COSTS.text; }
+  window.closeTypingOverlay = function(){ if(!isTypingOverlayOpen) return; isTypingOverlayOpen=false; msgInput.value=document.getElementById('typingTextarea').value; document.getElementById('typingOverlay').style.display='none'; document.getElementById('bottomInputArea').style.display='flex'; document.body.style.overflow=''; document.getElementById('typingTextarea').value=''; };
+  document.getElementById('typingTextarea').addEventListener('input', function(){ document.getElementById('charCount').textContent=this.value.length; });
+  msgInput.addEventListener('focus', function(){ if(!hasPaid||this.disabled) return; if(isTypingOverlayOpen) return; openTypingOverlay(); });
+  window.sendMessageFromOverlay = async function(){ const text=document.getElementById('typingTextarea').value.trim(); if(!text||!hasPaid||!currentUser) return; closeTypingOverlay(); msgInput.value=text; await window.sendMessage(); msgInput.value=''; };
+  function insertMentionOverlay(){ const ta=document.getElementById('typingTextarea'); const pos=ta.selectionStart; ta.value=ta.value.substring(0,pos)+'@'+ta.value.substring(pos); ta.focus(); ta.setSelectionRange(pos+1,pos+1); }
+  window.insertMentionOverlay = insertMentionOverlay;
+
+  // ============================================================
+  // JOIN ROOM
+  // ============================================================
+  async function joinRoom(uid, rid){ try{ const roomRef=doc(db,'rooms',rid); const roomSnap=await getDoc(roomRef); if(!roomSnap.exists()){ showToast('Room not found','error'); return false; } roomData=roomSnap.data(); roomNameEl.textContent=(roomData.name||'Room')+' 🔥'; const fee=roomData.entryFee||50; isRoomOwner=roomData.createdBy===uid; if(isRoomOwner){ hasPaid=true; isModerator=true; isElite=true; roomFeeEl.textContent=`🪙 ${fee} (free)`; msgInput.disabled=false; sendBtn.disabled=false; showToast('👑 Owner mode','gold'); updateTierLocks(); return true; } const partRef=doc(db,'rooms',rid,'participants',uid); const partSnap=await getDoc(partRef); if(partSnap.exists()){ hasPaid=true; const data=partSnap.data(); if(data.vip) isVIP=true; if(data.premium) isPremium=true; if(data.elite) isElite=true; if(data.moderator) isModerator=true; roomFeeEl.textContent=`🪙 ${fee} (paid)`; msgInput.disabled=false; sendBtn.disabled=false; updateTierLocks(); return true; } await updateCoins(uid, -fee, `Join room: ${roomData.name||rid}`); await setDoc(partRef,{ joinedAt:serverTimestamp(), vip:false, premium:false, elite:false, moderator:false }); await updateDoc(roomRef,{participantCount:increment(1)}); hasPaid=true; coinBalance=await getCoins(uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; roomFeeEl.textContent=`🪙 ${fee} (paid)`; msgInput.disabled=false; sendBtn.disabled=false; showToast(`🎉 Joined! -${fee} 🪙`,'success'); addNotification(`Joined room — paid ${fee}🪙`,'success','Room Joined'); updateTierLocks(); return true; }catch(err){ showToast(err.message||'Failed to join','error'); return false; } }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  async function init(){ const urlParams=new URLSearchParams(window.location.search); roomId=urlParams.get('id'); if(!roomId){ showToast('No room ID','error'); setTimeout(()=>window.location.href='rooms.html',1500); return; } onAuthStateChanged(auth, async(user)=>{ if(!user){ window.location.href='index.html'; return; } currentUser=user; try{ const docSnap=await getDoc(doc(db,'users',user.uid)); if(docSnap.exists()){ const data=docSnap.data(); userSpId=data.spId||null; if(data.achievements) achievements=data.achievements; } }catch(e){} const joined=await joinRoom(user.uid, roomId); if(!joined){ setTimeout(()=>window.location.href='rooms.html',2000); return; } coinBalance=await getCoins(user.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; const msgQ=query(collection(db,'rooms',roomId,'messages'),orderBy('timestamp','asc'),limit(200)); messageUnsub=onSnapshot(msgQ, renderMessages, err=>showToast('Message error','error')); participantUnsub=onSnapshot(doc(db,'rooms',roomId), (snap)=>{ if(snap.exists()){ const data=snap.data(); memberCountEl.textContent=data.participantCount||0; memberBadge.textContent=data.participantCount||0; roomData=data; } }); setInterval(()=>{ const online=navigator.onLine; roomStatusDot.className='dot '+(online?'online':'offline'); roomStatusText.textContent=online?'online':'offline'; },10000); const today=new Date().toDateString(); const streakKey=`streak_${roomId}_${user.uid}`; if(localStorage.getItem(streakKey)!==today){ const bonus=isElite?8:isPremium?5:isVIP?4:2; await updateCoins(user.uid, bonus, 'Daily room bonus'); localStorage.setItem(streakKey,today); coinBalance=await getCoins(user.uid); coinEl.textContent=coinBalance; document.getElementById('sendCoinsBalance').textContent=coinBalance; showToast(`+${bonus} 🪙 daily bonus`,'success'); addNotification(`Daily bonus +${bonus}🪙`,'gold','Daily Bonus'); } container.scrollTop=container.scrollHeight; const typingRef=doc(db,'rooms',roomId,'typing','state'); onSnapshot(typingRef, (snap)=>{ if(snap.exists()){ const data=snap.data(); const typer=data.uid; if(typer&&typer!==currentUser.uid){ typingIndicator.textContent=`${data.name||'Someone'} is typing…`; typingIndicator.classList.add('active'); clearTimeout(typingIndicator._timeout); typingIndicator._timeout=setTimeout(()=>typingIndicator.classList.remove('active'),3000); }else{ typingIndicator.classList.remove('active'); } } }, (err)=>console.error(err)); msgInput.addEventListener('input',()=>{ if(msgInput.value.trim()){ setDoc(typingRef,{ uid:currentUser.uid, name:currentUser.displayName||'User', updatedAt:serverTimestamp() },{merge:true}); } }); msgInput.addEventListener('blur',()=>{ setDoc(typingRef,{uid:null, updatedAt:serverTimestamp()},{merge:true}); }); updateTierLocks(); loadGiftBadgeCount(); loadParticipants(); addNotification('Welcome to the room! 🎉','info','Welcome'); }); }
+
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(document.getElementById('userMenu').style.display==='block') closeUserMenu(); else if(premiumPanelOverlay.classList.contains('open')) closePremiumPanel(); else if(document.getElementById('giftSendOverlay').classList.contains('open')) closeGiftSendModal(); else if(document.getElementById('giftsPanelOverlay').classList.contains('open')) closeGiftsPanel(); else if(document.getElementById('stickerPickerOverlay').classList.contains('open')) closeStickerPicker(); else if(document.getElementById('reactionPickerOverlay').classList.contains('open')) closeReactionPicker(); else if(document.getElementById('contactModalOverlay').classList.contains('open')) closeContactModal(); else if(profileModalOverlay.classList.contains('open')) closeProfileModal(); else if(document.getElementById('sendCoinsOverlay').classList.contains('open')) closeSendCoinsModal(); else if(moreDropdown.classList.contains('open')) closeMoreDropdown(); else if(isTypingOverlayOpen) closeTypingOverlay(); else if(replyingTo) cancelReply(); else window.location.href='rooms.html'; } if((e.ctrlKey||e.metaKey)&&e.key==='p'){ e.preventDefault(); openPremiumPanel(); } if((e.ctrlKey||e.metaKey)&&e.key==='f'){ e.preventDefault(); toggleSearch(); } });
+
+  premiumPanelOverlay.addEventListener('click', function(e){ if(e.target===this) closePremiumPanel(); });
+  document.getElementById('contactModalOverlay').addEventListener('click', function(e){ if(e.target===this) closeContactModal(); });
+  profileModalOverlay.addEventListener('click', function(e){ if(e.target===this) closeProfileModal(); });
+  document.getElementById('giftSendOverlay').addEventListener('click', function(e){ if(e.target===this) closeGiftSendModal(); });
+  document.getElementById('giftsPanelOverlay').addEventListener('click', function(e){ if(e.target===this) closeGiftsPanel(); });
+  document.getElementById('sendCoinsOverlay').addEventListener('click', function(e){ if(e.target===this) closeSendCoinsModal(); });
+  document.getElementById('stickerPickerOverlay').addEventListener('click', function(e){ if(e.target===this) closeStickerPicker(); });
+  document.getElementById('reactionPickerOverlay').addEventListener('click', function(e){ if(e.target===this) closeReactionPicker(); });
+
+  init();
+  console.log('🔥 SPIKE ELITE Room — Loaded (voice fixed)');
+</script>
+</body>
+</html>

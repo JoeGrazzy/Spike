@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Find Friends — SPIKE Ultra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #070b10;
+            --bg-surface: #0d1520;
+            --bg-card: rgba(20, 32, 48, 0.7);
+            --bg-glass: rgba(13, 21, 32, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 168, 132, 0.3);
+            --primary: #00a884;
+            --primary-hover: #00c29a;
+            --primary-glow: rgba(0, 168, 132, 0.4);
+            --accent: #0ea5e9;
+            --error: #f43f5e;
+            --error-glow: rgba(244, 63, 94, 0.4);
+            --success: #00a884;
+            --success-glow: rgba(0, 168, 132, 0.4);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.4);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.light-mode {
+            --bg-deep: #f0f4fa;
+            --bg-surface: #e8edf4;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-glass: rgba(255, 255, 255, 0.92);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --text-main: #0f1824;
+            --text-muted: #5a6e8a;
+            --border-glow: rgba(0, 168, 132, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100%; height: 100%; overflow-x: hidden; background-color: var(--bg-deep); color: var(--text-main); font-family: var(--font-main); }
+        body { display: flex; flex-direction: column; justify-content: space-between; align-items: center; position: relative; min-height: 100dvh; }
+
+        body::before, body::after {
+            content: ''; position: fixed; width: 400px; height: 400px; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.1; pointer-events: none;
+        }
+        body::before { top: -100px; left: -100px; background: var(--primary); }
+        body::after { bottom: -100px; right: -100px; background: var(--accent); }
+
+        .feed-header {
+            width: 100%; max-width: 800px; padding: clamp(8px, 2vw, 14px) clamp(12px, 3vw, 24px); 
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color); background: var(--bg-glass); backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            gap: 8px;
+        }
+        .logo { 
+            font-size: clamp(1rem, 4vw, 1.4rem); font-weight: 800; letter-spacing: 1px; text-decoration: none; 
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 100%); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; 
+        }
+        .user-nav { display: flex; align-items: center; gap: clamp(4px, 2vw, 12px); flex-wrap: wrap; }
+        .nav-link { 
+            color: var(--text-muted); text-decoration: none; font-size: clamp(0.75rem, 2.5vw, 0.88rem); font-weight: 600; 
+            transition: var(--transition); cursor: pointer; padding: 6px 10px; border-radius: 8px; min-height: 36px; display: flex; align-items: center;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--primary); background: rgba(0, 168, 132, 0.08); }
+
+        .admin-heart-link {
+            display: none !important;
+            border-color: rgba(244, 63, 94, 0.3);
+            background: rgba(244, 63, 94, 0.08);
+            animation: pulse-heart 1.5s infinite ease-in-out;
+        }
+        .admin-heart-link.visible { display: flex !important; }
+        .admin-heart-link:hover { border-color: rgba(244, 63, 94, 0.6); background: rgba(244, 63, 94, 0.2); }
+        .admin-heart-link .heart-icon { display: inline-block; font-size: clamp(1rem, 3vw, 1.2rem); }
+        @keyframes pulse-heart { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+        .friends-main {
+            flex: 1; display: flex; flex-direction: column; align-items: center; padding: clamp(16px, 4vw, 24px) 12px; 
+            width: 100%; max-width: 620px; margin: auto; gap: clamp(16px, 4vw, 24px);
+        }
+
+        .section-card {
+            background: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--border-color); border-radius: clamp(18px, 4vw, 20px); 
+            padding: clamp(16px, 3vw, 20px); width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; gap: 16px;
+        }
+
+        .section-title { 
+            font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 800; color: var(--text-main); 
+            padding-bottom: 8px; border-bottom: 1px solid var(--border-color); 
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+        }
+        .section-title .badge { 
+            font-size: 0.7rem; background: var(--primary); color: white; padding: 2px 10px; border-radius: 20px; font-weight: 700; 
+        }
+        
+        .search-box {
+            display: flex; gap: 10px; width: 100%; flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1; min-width: 120px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); 
+            border-radius: 14px; padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px);
+            color: var(--text-main); font-family: var(--font-main); font-size: clamp(0.85rem, 2.5vw, 0.9rem); 
+            outline: none; transition: var(--transition); min-height: 44px;
+        }
+        .search-input:focus { border-color: var(--primary); background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 15px var(--primary-glow); }
+        .btn-action {
+            background: var(--primary); color: white; border: none; border-radius: 14px; 
+            padding: 0 clamp(16px, 4vw, 20px); font-weight: 700; font-size: clamp(0.85rem, 2.5vw, 0.9rem); 
+            cursor: pointer; transition: var(--transition); flex-shrink: 0; box-shadow: 0 0 15px var(--primary-glow);
+            min-height: 44px; touch-action: manipulation;
+        }
+        .btn-action:active { transform: scale(0.95); }
+        .btn-action:hover { background: var(--primary-hover); }
+
+        .tabs-container {
+            display: flex; gap: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: none; border: none; color: var(--text-muted); padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 16px); 
+            font-family: var(--font-main); font-weight: 700; font-size: clamp(0.75rem, 2.2vw, 0.85rem); 
+            cursor: pointer; transition: var(--transition); border-radius: 10px; touch-action: manipulation;
+            min-height: 36px;
+        }
+        .tab-btn:active { transform: scale(0.95); }
+        .tab-btn.active { color: var(--primary); background: rgba(0, 168, 132, 0.1); }
+        .tab-btn:hover { color: var(--text-main); }
+
+        /* ===== LOADING SHIMMER ===== */
+        .user-list-shimmer {
+            display: flex; flex-direction: column; gap: 10px; width: 100%;
+        }
+        .user-list-shimmer .shimmer-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            background: var(--bg-card); border-radius: 14px;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .user-list-shimmer .shimmer-avatar {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .user-list-shimmer .shimmer-line {
+            height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; flex: 1;
+        }
+        .user-list-shimmer .shimmer-line.short { width: 80px; flex: none; }
+
+        .user-list { display: flex; flex-direction: column; gap: 10px; max-height: 600px; overflow-y: auto; padding-right: 4px; }
+        .user-list::-webkit-scrollbar { width: 4px; }
+        .user-list::-webkit-scrollbar-track { background: transparent; }
+        .user-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        .user-item {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 14px; 
+            padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px);
+            display: flex; justify-content: space-between; align-items: center; transition: var(--transition);
+            gap: 8px; flex-wrap: wrap;
+            animation: fadeInItem 0.2s ease-out;
+        }
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-item:hover { border-color: rgba(0, 168, 132, 0.3); background: rgba(255, 255, 255, 0.04); }
+        .user-item.blocked { opacity: 0.5; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.05); }
+        .user-item.blocked .username { color: var(--text-muted); }
+
+        .user-info-group { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        
+        .avatar-wrapper {
+            position: relative;
+            width: clamp(36px, 9vw, 44px);
+            height: clamp(36px, 9vw, 44px);
+            flex-shrink: 0;
+        }
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #005c4b);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; overflow: hidden; 
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 0 10px var(--primary-glow);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .blocked .avatar { background: linear-gradient(135deg, #444, #222); box-shadow: none; }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-deep);
+            background: var(--text-muted);
+        }
+        .online-indicator.online {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success-glow);
+        }
+        .online-indicator.offline {
+            background: var(--text-muted);
+        }
+
+        .user-meta-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+        .username { font-weight: 700; font-size: clamp(0.85rem, 2.5vw, 0.95rem); color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-handle { font-size: clamp(0.65rem, 2vw, 0.78rem); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; }
+        .mutual-friends { font-size: 0.6rem; color: var(--primary); background: rgba(0,168,132,0.1); padding: 1px 8px; border-radius: 12px; }
+
+        .action-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+
+        .btn-sm {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: var(--text-main); 
+            padding: clamp(4px, 1.5vw, 6px) clamp(8px, 2.5vw, 12px);
+            border-radius: 10px; font-size: clamp(0.65rem, 2vw, 0.75rem); font-weight: 700; 
+            cursor: pointer; transition: var(--transition); text-decoration: none; flex-shrink: 0;
+            min-height: 32px; touch-action: manipulation;
+        }
+        .btn-sm:active { transform: scale(0.95); }
+        .btn-sm:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); color: var(--text-main); }
+        .btn-sm.primary { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 0 10px var(--primary-glow); }
+        .btn-sm.primary:hover { background: var(--primary-hover); }
+        .btn-sm.danger { background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.3); color: var(--error); }
+        .btn-sm.danger:hover { background: rgba(244, 63, 94, 0.25); }
+        .btn-sm.warning { background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: var(--warning); }
+        .btn-sm.warning:hover { background: rgba(245, 158, 11, 0.25); }
+        .btn-sm.success { background: rgba(0, 168, 132, 0.15); border-color: rgba(0, 168, 132, 0.3); color: var(--success); }
+        .btn-sm.success:hover { background: rgba(0, 168, 132, 0.25); }
+        .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+        .empty-state { text-align: center; color: var(--text-muted); font-size: clamp(0.8rem, 2.5vw, 0.88rem); padding: 30px 20px; }
+        .empty-state .icon { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 10px; display: block; }
+
+        .load-more-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 10px 20px; border-radius: 12px; width: 100%; font-family: var(--font-main);
+            font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: var(--transition);
+            min-height: 44px;
+        }
+        .load-more-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+
+        .feed-footer { 
+            width: 100%; max-width: 800px; padding: clamp(12px, 2.5vw, 20px) clamp(12px, 3vw, 24px); 
+            text-align: center; font-size: clamp(0.7rem, 2vw, 0.8rem); color: var(--text-muted); 
+            border-top: 1px solid var(--border-color); flex-shrink: 0; background: var(--bg-glass); backdrop-filter: blur(16px);
+        }
+
+        /* === TOAST === */
+        .toast-container {
+            position: fixed; top: 28px; left: 50%; transform: translateX(-50%) translateY(-30px); z-index: 9999;
+            width: calc(100% - 32px); max-width: 420px; opacity: 0; visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;
+        }
+        .toast-container.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .toast-content {
+            background: var(--bg-glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: clamp(12px, 3vw, 16px) clamp(14px, 4vw, 20px); display: flex; align-items: center; gap: clamp(10px, 3vw, 16px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 168, 132, 0.05); position: relative; overflow: hidden;
+            animation: toastSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes toastSlideIn { 0% { opacity: 0; transform: translateY(-20px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastSlideOut { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+        .toast-container.removing .toast-content { animation: toastSlideOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .toast-content::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 30%, var(--toast-glow-color) 0%, transparent 70%); opacity: 0.3; pointer-events: none; z-index: 0;
+        }
+        .toast-content > * { position: relative; z-index: 1; }
+        .toast-icon-wrapper {
+            width: clamp(36px, 10vw, 44px); height: clamp(36px, 10vw, 44px); min-width: clamp(36px, 10vw, 44px); border-radius: 14px; 
+            display: flex; align-items: center; justify-content: center; font-size: clamp(1rem, 3.5vw, 1.3rem); font-weight: 800; 
+            flex-shrink: 0; position: relative;
+        }
+        .toast-icon-wrapper::before {
+            content: ''; position: absolute; inset: -2px; border-radius: 16px; background: var(--toast-glow-color); opacity: 0.15; filter: blur(8px);
+        }
+        .toast-icon-wrapper .icon { position: relative; z-index: 1; }
+
+        .toast-container.success { --toast-glow-color: rgba(0, 168, 132, 0.6); }
+        .toast-container.success .toast-icon-wrapper { background: rgba(0, 168, 132, 0.15); border: 1px solid rgba(0, 168, 132, 0.3); color: var(--success); box-shadow: 0 0 30px rgba(0, 168, 132, 0.15); }
+        .toast-container.success .toast-content { border-color: rgba(0, 168, 132, 0.25); }
+        .toast-container.error { --toast-glow-color: rgba(244, 63, 94, 0.6); }
+        .toast-container.error .toast-icon-wrapper { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--error); box-shadow: 0 0 30px rgba(244, 63, 94, 0.15); }
+        .toast-container.error .toast-content { border-color: rgba(244, 63, 94, 0.25); }
+        .toast-container.warning { --toast-glow-color: rgba(245, 158, 11, 0.6); }
+        .toast-container.warning .toast-icon-wrapper { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--warning); box-shadow: 0 0 30px rgba(245, 158, 11, 0.15); }
+        .toast-container.warning .toast-content { border-color: rgba(245, 158, 11, 0.25); }
+
+        .toast-text-group { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .toast-title { font-size: clamp(0.75rem, 2.5vw, 0.85rem); font-weight: 800; color: var(--text-main); letter-spacing: -0.2px; line-height: 1.3; }
+        .toast-message { font-size: clamp(0.7rem, 2.2vw, 0.78rem); font-weight: 500; color: var(--text-muted); line-height: 1.4; opacity: 0.9; }
+        .toast-close-btn {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); color: var(--text-muted);
+            width: clamp(24px, 6vw, 28px); height: clamp(24px, 6vw, 28px); min-width: clamp(24px, 6vw, 28px); border-radius: 50%; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; transition: var(--transition); 
+            flex-shrink: 0; touch-action: manipulation;
+        }
+        .toast-close-btn:active { transform: scale(0.9); }
+        .toast-close-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border-color: rgba(255, 255, 255, 0.2); }
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 2px; background: var(--toast-glow-color); border-radius: 0 0 20px 20px;
+            width: 100%; animation: toastProgress 3s linear forwards;
+        }
+        @keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }
+        .toast-container.success .toast-progress { background: var(--success); box-shadow: 0 0 20px var(--success-glow); }
+        .toast-container.error .toast-progress { background: var(--error); box-shadow: 0 0 20px var(--error-glow); }
+        .toast-container.warning .toast-progress { background: var(--warning); box-shadow: 0 0 20px var(--warning-glow); }
+
+        /* === CONFIRMATION MODAL === */
+        .confirm-modal-overlay {
+            position: fixed; inset: 0; background: rgba(3, 7, 13, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .confirm-modal-overlay.active { display: flex; opacity: 1; animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes modalSlideUp { 0% { opacity: 0; transform: translateY(30px) scale(0.96); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .confirm-modal {
+            background: var(--bg-surface); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border-color);
+            border-radius: clamp(20px, 5vw, 28px); padding: clamp(20px, 5vw, 32px) clamp(16px, 4vw, 28px); max-width: 440px; width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 60px var(--toast-glow-color);
+            animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden;
+        }
+        .confirm-modal::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 0%, var(--toast-glow-color) 0%, transparent 60%); opacity: 0.1; pointer-events: none; z-index: 0;
+        }
+        .confirm-modal > * { position: relative; z-index: 1; }
+
+        .confirm-modal-icon {
+            width: clamp(56px, 15vw, 72px); height: clamp(56px, 15vw, 72px); border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: clamp(1.8rem, 5vw, 2.2rem); margin: 0 auto 16px auto; position: relative;
+        }
+        .confirm-modal-icon::before {
+            content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--toast-glow-color); opacity: 0.15; filter: blur(12px);
+        }
+        .confirm-modal-icon .icon { position: relative; z-index: 1; }
+
+        .confirm-modal.danger { --toast-glow-color: rgba(244, 63, 94, 0.5); }
+        .confirm-modal.danger .confirm-modal-icon { background: rgba(244, 63, 94, 0.12); border: 2px solid rgba(244, 63, 94, 0.25); color: var(--error); box-shadow: 0 0 40px rgba(244, 63, 94, 0.1); }
+        .confirm-modal.warning { --toast-glow-color: rgba(245, 158, 11, 0.5); }
+        .confirm-modal.warning .confirm-modal-icon { background: rgba(245, 158, 11, 0.12); border: 2px solid rgba(245, 158, 11, 0.25); color: var(--warning); box-shadow: 0 0 40px rgba(245, 158, 11, 0.1); }
+        .confirm-modal.success { --toast-glow-color: rgba(0, 168, 132, 0.5); }
+        .confirm-modal.success .confirm-modal-icon { background: rgba(0, 168, 132, 0.12); border: 2px solid rgba(0, 168, 132, 0.25); color: var(--success); box-shadow: 0 0 40px rgba(0, 168, 132, 0.1); }
+
+        .confirm-modal-title { font-size: clamp(1.1rem, 3.5vw, 1.3rem); font-weight: 800; color: var(--text-main); text-align: center; letter-spacing: -0.3px; line-height: 1.3; }
+        .confirm-modal-message { font-size: clamp(0.8rem, 2.5vw, 0.92rem); color: var(--text-muted); text-align: center; line-height: 1.6; margin: 8px 0 4px 0; padding: 0 4px; }
+        .confirm-modal-details { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; margin: 8px 0 12px 0; font-size: clamp(0.75rem, 2.2vw, 0.82rem); color: var(--text-muted); line-height: 1.5; }
+
+        .confirm-modal-actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+        .confirm-modal-actions .btn-confirm {
+            flex: 1; min-width: 100px; padding: clamp(10px, 3vw, 14px); border-radius: 14px; border: none; font-family: var(--font-main); 
+            font-weight: 700; font-size: clamp(0.8rem, 2.5vw, 0.92rem); cursor: pointer; transition: var(--transition); touch-action: manipulation;
+        }
+        .confirm-modal-actions .btn-confirm:active { transform: scale(0.95); }
+        .confirm-modal-actions .btn-confirm.primary { background: var(--primary); color: white; box-shadow: 0 0 20px var(--primary-glow); }
+        .confirm-modal-actions .btn-confirm.primary:hover { background: var(--primary-hover); }
+        .confirm-modal-actions .btn-confirm.danger { background: var(--error); color: white; box-shadow: 0 0 20px var(--error-glow); }
+        .confirm-modal-actions .btn-confirm.danger:hover { background: #e11d48; }
+        .confirm-modal-actions .btn-confirm.secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .confirm-modal-actions .btn-confirm.secondary:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
+
+        @media (max-width: 480px) {
+            .feed-header { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+            .user-nav { gap: 4px; }
+            .nav-link { font-size: 0.7rem; padding: 4px 8px; }
+            .action-group { flex-wrap: wrap; }
+            .btn-sm { font-size: 0.65rem; padding: 3px 8px; }
+            .user-item { flex-direction: column; align-items: stretch; text-align: center; }
+            .user-info-group { justify-content: center; }
+            .action-group { justify-content: center; }
+            .toast-content { padding: 12px 14px; border-radius: 14px; }
+            .toast-icon-wrapper { width: 36px; height: 36px; min-width: 36px; font-size: 1rem; }
+            .toast-title { font-size: 0.8rem; }
+            .toast-message { font-size: 0.72rem; }
+            .confirm-modal { padding: 20px 16px; border-radius: 20px; }
+            .confirm-modal-title { font-size: 1.1rem; }
+            .confirm-modal-message { font-size: 0.85rem; }
+            .confirm-modal-actions { flex-direction: column; }
+            .confirm-modal-actions .btn-confirm { padding: 12px; }
+        }
+
+        @media (max-width: 380px) {
+            .nav-link { font-size: 0.6rem; padding: 3px 6px; }
+            .btn-sm { font-size: 0.6rem; padding: 2px 6px; }
+        }
+
+        @media (pointer: coarse) {
+            .nav-link, .btn-action, .tab-btn, .btn-sm, .toast-close-btn, .btn-confirm {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .tab-btn { min-height: 36px; }
+            .btn-sm { min-height: 36px; }
+        }
+    </style>
+
+    <script type="module">
+        // ===== 🚀 ENHANCED FRIENDS PAGE =====
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, collection, doc, getDoc, getDocs, updateDoc, arrayUnion, arrayRemove, onSnapshot, setDoc, query, where, limit, startAfter, orderBy 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAm8ghbQ_lwJdNXEhWGos0eyi5wtvGuRR4",
+            authDomain: "grazzy-9e736.firebaseapp.com",
+            projectId: "grazzy-9e736",
+            storageBucket: "grazzy-9e736.firebasestorage.app",
+            messagingSenderId: "750326949170",
+            appId: "1:750326949170:web:5d19744aafc8675918632b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAILS = ["eletexjoeytex@gmail.com"];
+
+        // ===== STATE =====
+        const CACHE_VERSION = 'v3';
+        let currentUser = null;
+        let allMembersCache = [];
+        let currentTab = 'all';
+        let toastTimeout = null;
+        let pendingAction = null;
+        let userDataCache = {};
+        let friendUids = [];
+        let onlineStatuses = {}; // uid: boolean
+        let lastSeen = {}; // uid: timestamp
+
+        // ===== TOAST =====
+        window.showToast = function(message, type = 'success', title = '') {
+            const toast = document.getElementById('globalToast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+
+            toast.className = 'toast-container';
+            const titles = { success: '✓ Success', error: '✕ Error', warning: '⚠️ Warning' };
+            const icons = { success: '✓', error: '✕', warning: '⚠️' };
+
+            toastTitle.textContent = title || titles[type] || 'Notification';
+            toastMessage.textContent = message;
+            toastIcon.textContent = icons[type] || '✓';
+
+            void toast.offsetWidth;
+            toast.classList.add(type, 'active');
+
+            toastTimeout = setTimeout(() => { dismissToast(); }, 3500);
+        };
+
+        window.dismissToast = function() {
+            const toast = document.getElementById('globalToast');
+            if (!toast.classList.contains('active')) return;
+            toast.classList.add('removing');
+            setTimeout(() => {
+                toast.className = 'toast-container';
+                toast.classList.remove('removing');
+                if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+            }, 400);
+        };
+
+        // === CONFIRMATION MODAL ===
+        window.showConfirmModal = function(options) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('confirmModalOverlay');
+                const modal = document.getElementById('confirmModal');
+                const icon = document.getElementById('confirmModalIcon');
+                const title = document.getElementById('confirmModalTitle');
+                const message = document.getElementById('confirmModalMessage');
+                const details = document.getElementById('confirmModalDetails');
+                const confirmBtn = document.getElementById('confirmModalConfirm');
+                const cancelBtn = document.getElementById('confirmModalCancel');
+
+                modal.className = 'confirm-modal ' + (options.type || 'warning');
+                icon.textContent = options.icon || '⚠️';
+                title.textContent = options.title || 'Are you sure?';
+                message.textContent = options.message || 'This action cannot be undone.';
+                
+                if (options.details) {
+                    details.innerHTML = options.details;
+                    details.style.display = 'block';
+                } else {
+                    details.style.display = 'none';
+                }
+
+                confirmBtn.textContent = options.confirmText || 'Confirm';
+                confirmBtn.className = 'btn-confirm ' + (options.confirmType || 'danger');
+                cancelBtn.textContent = options.cancelText || 'Cancel';
+
+                pendingAction = { resolve };
+                overlay.classList.add('active');
+            });
+        };
+
+        window.closeConfirmModal = function() {
+            document.getElementById('confirmModalOverlay').classList.remove('active');
+        };
+
+        window.handleConfirm = function() {
+            if (pendingAction) {
+                pendingAction.resolve(true);
+                pendingAction = null;
+            }
+            closeConfirmModal();
+        };
+
+        window.handleCancel = function() {
+            if (pendingAction) {
+                pendingAction.resolve(false);
+                pendingAction = null;
+            }
+            closeConfirmModal();
+        };
+
+        document.getElementById('confirmModalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) handleCancel();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') handleCancel();
+        });
+
+        // === HELPERS ===
+        function escapeHTML(str) {
+            return String(str || '').replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function getInitials(name) {
+            if (!name) return 'U';
+            const parts = name.trim().split(' ');
+            if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return '';
+            let date;
+            if (timestamp?.toDate) {
+                date = timestamp.toDate();
+            } else {
+                date = new Date(timestamp);
+            }
+            if (isNaN(date.getTime())) return '';
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 5) return 'Just now';
+            if (diff < 60) return `${diff}s ago`;
+            const minutes = Math.floor(diff / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        }
+
+        function getAvatarHTML(data, uid) {
+            const avatarUrl = data.avatar || data.photoURL || data.profilePic || '';
+            if (avatarUrl) {
+                return `<img src="${escapeHTML(avatarUrl)}" alt="${escapeHTML(data.name || 'User')}">`;
+            }
+            return getInitials(data.name || 'User');
+        }
+
+        // === APPLY THEME ===
+        function applyTheme() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('spikeSettings') || '{}');
+                const primary = settings.accentColor || '#00a884';
+                document.documentElement.style.setProperty('--primary', primary);
+                document.documentElement.style.setProperty('--primary-glow', primary + '40');
+                document.documentElement.style.setProperty('--primary-hover', primary);
+                if (settings.darkMode === false) {
+                    document.body.classList.add('light-mode');
+                } else {
+                    document.body.classList.remove('light-mode');
+                }
+            } catch (e) {}
+        }
+        applyTheme();
+
+        // === NAVIGATION ===
+        window.goToFeed = function() { window.location.href = "feed.html"; };
+        window.goToMessages = function() { window.location.href = "chat.html"; };
+        window.goToFriends = function() { window.location.href = "friends.html"; };
+        window.goToProfile = function() { window.location.href = "profile.html"; };
+        window.goToAdmin = function() { window.location.href = "administrator.html"; };
+        window.goToGroups = function() { window.location.href = "community.html"; };
+
+        // === AUTH ===
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            currentUser = user;
+            
+            const adminLink = document.getElementById('adminNavLink');
+            if (user.email && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+                adminLink.classList.add('visible');
+            }
+
+            // Ensure user document exists
+            await ensureUserDocument(currentUser.uid);
+
+            // Listen for online status of friends
+            listenToFriendStatuses();
+
+            // Load members
+            await loadMembers();
+            renderMemberDirectory();
+
+            // Listen for changes to current user's friend list
+            onSnapshot(doc(db, "users", currentUser.uid), async () => {
+                await loadMembers();
+                renderMemberDirectory();
+            });
+
+            console.log('👥 Friends page loaded');
+        });
+
+        async function ensureUserDocument(uid) {
+            try {
+                const userRef = doc(db, "users", uid);
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) {
+                    const newData = {
+                        name: 'User',
+                        email: '',
+                        avatar: '',
+                        bio: '',
+                        friends: [],
+                        friendRequests: [],
+                        sentRequests: [],
+                        blockedUsers: [],
+                        joinedGroups: [],
+                        createdAt: new Date().toISOString()
+                    };
+                    await setDoc(userRef, newData);
+                }
+            } catch (err) {
+                console.error("Error ensuring user document:", err);
+            }
+        }
+
+        function listenToFriendStatuses() {
+            if (!currentUser) return;
+            const userRef = doc(db, "users", currentUser.uid);
+            onSnapshot(userRef, async (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+                friendUids = data.friends || [];
+                // Listen to each friend's status
+                friendUids.forEach(uid => {
+                    const friendRef = doc(db, "users", uid);
+                    onSnapshot(friendRef, (friendSnap) => {
+                        if (friendSnap.exists()) {
+                            const fData = friendSnap.data();
+                            onlineStatuses[uid] = fData.status === 'online';
+                            lastSeen[uid] = fData.lastSeen || null;
+                            // Re-render if on friends tab or all tab
+                            if (currentTab === 'friends' || currentTab === 'all') {
+                                renderMemberDirectory();
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        // === LOAD MEMBERS with pagination ===
+        let lastDoc = null;
+        let hasMore = true;
+        const PAGE_SIZE = 20;
+
+        async function loadMembers(reset = true) {
+            if (reset) {
+                allMembersCache = [];
+                lastDoc = null;
+                hasMore = true;
+            }
+            if (!hasMore) return;
+
+            try {
+                let q = query(collection(db, "users"), orderBy("name"), limit(PAGE_SIZE));
+                if (lastDoc) {
+                    q = query(collection(db, "users"), orderBy("name"), startAfter(lastDoc), limit(PAGE_SIZE));
+                }
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    hasMore = false;
+                    return;
+                }
+                lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                snapshot.forEach(docSnap => {
+                    if (docSnap.id === currentUser.uid) return;
+                    const data = docSnap.data();
+                    allMembersCache.push({ id: docSnap.id, ...data });
+                });
+                if (snapshot.docs.length < PAGE_SIZE) {
+                    hasMore = false;
+                }
+                // Cache
+                localStorage.setItem(`members_${currentUser.uid}_${CACHE_VERSION}`, JSON.stringify(allMembersCache));
+            } catch (err) {
+                console.error("Error loading members:", err);
+                showToast("Failed to load members. Please refresh.", "error", "Connection Error");
+            }
+        }
+
+        window.loadMoreMembers = async function() {
+            await loadMembers(false);
+            renderMemberDirectory();
+        };
+
+        // === RENDER ===
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            renderMemberDirectory();
+        };
+
+        window.renderMemberDirectory = async function() {
+            const queryText = document.getElementById("searchInput").value.trim().toLowerCase();
+            const searchResultsEl = document.getElementById("searchResults");
+
+            try {
+                const mySnap = await getDoc(doc(db, "users", currentUser.uid));
+                const myData = mySnap.exists() ? mySnap.data() : {};
+                const myFriends = myData.friends || [];
+                const sentRequests = myData.sentRequests || [];
+                const incomingRequests = myData.friendRequests || [];
+                const blockedUsers = myData.blockedUsers || [];
+
+                let filteredMembers = allMembersCache;
+
+                // Apply filters
+                if (currentTab === 'friends') {
+                    filteredMembers = allMembersCache.filter(u => myFriends.includes(u.id));
+                } else if (currentTab === 'requests') {
+                    filteredMembers = allMembersCache.filter(u => incomingRequests.includes(u.id) || sentRequests.includes(u.id));
+                } else if (currentTab === 'blocked') {
+                    filteredMembers = allMembersCache.filter(u => blockedUsers.includes(u.id));
+                } else {
+                    filteredMembers = allMembersCache.filter(u => !blockedUsers.includes(u.id));
+                }
+
+                if (queryText) {
+                    filteredMembers = filteredMembers.filter(u => {
+                        const name = u.name || u.displayName || u.username || 'User';
+                        return name.toLowerCase().includes(queryText);
+                    });
+                }
+
+                // Sort: incoming first, then friends
+                filteredMembers.sort((a, b) => {
+                    const aIncoming = incomingRequests.includes(a.id);
+                    const bIncoming = incomingRequests.includes(b.id);
+                    if (aIncoming && !bIncoming) return -1;
+                    if (!aIncoming && bIncoming) return 1;
+                    const aFriend = myFriends.includes(a.id);
+                    const bFriend = myFriends.includes(b.id);
+                    if (aFriend && !bFriend) return -1;
+                    if (!aFriend && bFriend) return 1;
+                    return 0;
+                });
+
+                document.getElementById('friendCount').textContent = myFriends.length;
+
+                if (filteredMembers.length === 0) {
+                    let message = 'No members found.';
+                    if (currentTab === 'friends') message = 'You have no friends yet. Search for people to connect!';
+                    else if (currentTab === 'requests') message = 'No pending friend requests.';
+                    else if (currentTab === 'blocked') message = 'You haven\'t blocked anyone.';
+                    else if (queryText) message = `No members found matching "${escapeHTML(queryText)}".`;
+                    searchResultsEl.innerHTML = `<div class="empty-state"><span class="icon">👤</span>${message}</div>`;
+                    return;
+                }
+
+                let html = "";
+                for (const uData of filteredMembers) {
+                    const name = uData.name || uData.displayName || uData.username || 'User';
+                    const isFriend = myFriends.includes(uData.id);
+                    const isRequested = sentRequests.includes(uData.id);
+                    const isIncoming = incomingRequests.includes(uData.id);
+                    const isBlocked = blockedUsers.includes(uData.id);
+                    const avatarHTML = getAvatarHTML(uData, uData.id);
+                    
+                    // Online status
+                    const isOnline = onlineStatuses[uData.id] || false;
+                    const lastSeenTime = lastSeen[uData.id] || null;
+                    const statusText = isOnline ? '🟢 Online' : (lastSeenTime ? `Last seen ${formatTimeAgo(lastSeenTime)}` : 'Offline');
+
+                    // Mutual friends
+                    const mutualFriends = myFriends.filter(fid => {
+                        const friendData = allMembersCache.find(u => u.id === fid);
+                        return friendData && (friendData.friends || []).includes(uData.id);
+                    });
+                    const mutualCount = mutualFriends.length;
+
+                    let actionHtml = '';
+                    let itemClass = '';
+
+                    if (isBlocked) {
+                        itemClass = 'blocked';
+                        actionHtml = `
+                            <button class="btn-sm success" onclick="unblockUser('${uData.id}')">🔓 Unblock</button>
+                        `;
+                    } else if (isFriend) {
+                        actionHtml = `
+                            <div class="action-group">
+                                <button class="btn-sm primary" onclick="window.location.href='chat_room.html?userId=${uData.id}&name=${encodeURIComponent(name)}'">💬 Chat</button>
+                                <button class="btn-sm warning" onclick="unfriendUser('${uData.id}')">Unfriend</button>
+                                <button class="btn-sm danger" onclick="blockUser('${uData.id}')">🚫 Block</button>
+                            </div>
+                        `;
+                    } else if (isRequested) {
+                        actionHtml = `
+                            <div class="action-group">
+                                <button class="btn-sm danger" onclick="cancelRequest('${uData.id}')">Cancel Request</button>
+                                <button class="btn-sm danger" onclick="blockUser('${uData.id}')">🚫 Block</button>
+                            </div>
+                        `;
+                    } else if (isIncoming) {
+                        actionHtml = `
+                            <div class="action-group">
+                                <button class="btn-sm primary" onclick="acceptRequest('${uData.id}')">Accept</button>
+                                <button class="btn-sm danger" onclick="declineRequest('${uData.id}')">Decline</button>
+                                <button class="btn-sm danger" onclick="blockUser('${uData.id}')">🚫 Block</button>
+                            </div>
+                        `;
+                    } else {
+                        actionHtml = `
+                            <div class="action-group">
+                                <button class="btn-sm primary" onclick="sendRequest('${uData.id}')">Add Friend</button>
+                                <button class="btn-sm danger" onclick="blockUser('${uData.id}')">🚫 Block</button>
+                            </div>
+                        `;
+                    }
+
+                    const statusLabel = isBlocked ? '🚫 Blocked' : 
+                                      isIncoming ? '📩 Incoming Request' : 
+                                      isRequested ? '⏳ Pending' : 
+                                      isFriend ? '✅ Friend' : '';
+
+                    const onlineDot = isOnline ? 'online' : 'offline';
+
+                    html += `
+                        <div class="user-item ${itemClass}">
+                            <div class="user-info-group">
+                                <div class="avatar-wrapper">
+                                    <div class="avatar">${avatarHTML}</div>
+                                    <span class="online-indicator ${onlineDot}"></span>
+                                </div>
+                                <div class="user-meta-info">
+                                    <span class="username">${escapeHTML(name)}</span>
+                                    <span class="user-handle">
+                                        ${statusLabel}
+                                        ${mutualCount > 0 ? `<span class="mutual-friends">${mutualCount} mutual</span>` : ''}
+                                        <span style="font-size:0.6rem;color:var(--text-muted);">${isOnline ? '🟢 Online' : ''}</span>
+                                    </span>
+                                </div>
+                            </div>
+                            ${actionHtml}
+                        </div>
+                    `;
+                }
+
+                searchResultsEl.innerHTML = html;
+
+                // Show load more button if there are more members
+                if (hasMore && currentTab === 'all' && !queryText) {
+                    const loadMoreHTML = `<button class="load-more-btn" onclick="loadMoreMembers()">Load More</button>`;
+                    // Append to results
+                    searchResultsEl.innerHTML += loadMoreHTML;
+                }
+
+            } catch (err) {
+                console.error("Render error:", err);
+                searchResultsEl.innerHTML = `<div class="empty-state"><span class="icon">⚠️</span>Error loading members. Please refresh.</div>`;
+                showToast("Failed to render members.", "error", "Error");
+            }
+        };
+
+        // === FRIEND ACTIONS ===
+        window.sendRequest = async function(targetUid) {
+            const btn = document.querySelector(`[onclick*="sendRequest('${targetUid}')"]`);
+            if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+            try {
+                await ensureUserDocument(targetUid);
+                const myRef = doc(db, "users", currentUser.uid);
+                const mySnap = await getDoc(myRef);
+                const myData = mySnap.exists() ? mySnap.data() : {};
+                if ((myData.friends || []).includes(targetUid)) {
+                    showToast("You are already friends.", "warning");
+                    if (btn) { btn.disabled = false; btn.textContent = 'Add Friend'; }
+                    return;
+                }
+                if ((myData.sentRequests || []).includes(targetUid)) {
+                    showToast("Request already sent.", "warning");
+                    if (btn) { btn.disabled = false; btn.textContent = 'Add Friend'; }
+                    return;
+                }
+                await updateDoc(doc(db, "users", targetUid), {
+                    friendRequests: arrayUnion(currentUser.uid)
+                });
+                await updateDoc(myRef, {
+                    sentRequests: arrayUnion(targetUid)
+                });
+                showToast("Friend request sent!", "success", "Request Sent");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error sending request:", err);
+                showToast("Failed to send request.", "error", "Request Failed");
+            }
+            if (btn) { btn.disabled = false; btn.textContent = 'Add Friend'; }
+        };
+
+        window.cancelRequest = async function(targetUid) {
+            try {
+                await updateDoc(doc(db, "users", targetUid), {
+                    friendRequests: arrayRemove(currentUser.uid)
+                });
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    sentRequests: arrayRemove(targetUid)
+                });
+                showToast("Request cancelled.", "warning", "Cancelled");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error cancelling request:", err);
+                showToast("Failed to cancel request.", "error", "Action Failed");
+            }
+        };
+
+        window.acceptRequest = async function(senderUid) {
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    friends: arrayUnion(senderUid),
+                    friendRequests: arrayRemove(senderUid)
+                });
+                await updateDoc(doc(db, "users", senderUid), {
+                    friends: arrayUnion(currentUser.uid),
+                    sentRequests: arrayRemove(currentUser.uid)
+                });
+                showToast("Friend request accepted!", "success", "Connected");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error accepting request:", err);
+                showToast("Failed to accept request.", "error", "Action Failed");
+            }
+        };
+
+        window.declineRequest = async function(senderUid) {
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    friendRequests: arrayRemove(senderUid)
+                });
+                await updateDoc(doc(db, "users", senderUid), {
+                    sentRequests: arrayRemove(currentUser.uid)
+                });
+                showToast("Request declined.", "warning", "Declined");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error declining request:", err);
+                showToast("Failed to decline request.", "error", "Action Failed");
+            }
+        };
+
+        window.unfriendUser = async function(targetUid) {
+            const user = allMembersCache.find(u => u.id === targetUid);
+            const userName = user ? (user.name || user.displayName || 'this user') : 'this user';
+            const confirmed = await showConfirmModal({
+                type: 'warning',
+                icon: '💔',
+                title: 'Unfriend',
+                message: `Remove ${escapeHTML(userName)} from your friends?`,
+                details: `They will be able to send you a new friend request in the future.`,
+                confirmText: 'Unfriend',
+                confirmType: 'warning',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) return;
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    friends: arrayRemove(targetUid)
+                });
+                await updateDoc(doc(db, "users", targetUid), {
+                    friends: arrayRemove(currentUser.uid)
+                });
+                showToast("Unfriended.", "warning", "Unfriended");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error unfriending:", err);
+                showToast("Failed to unfriend.", "error", "Action Failed");
+            }
+        };
+
+        window.blockUser = async function(targetUid) {
+            const user = allMembersCache.find(u => u.id === targetUid);
+            const userName = user ? (user.name || user.displayName || 'this user') : 'this user';
+            const confirmed = await showConfirmModal({
+                type: 'danger',
+                icon: '🚫',
+                title: 'Block User',
+                message: `Block ${escapeHTML(userName)}?`,
+                details: `They won't see your profile, posts, or messages. They will be removed from your friends list.`,
+                confirmText: 'Block',
+                confirmType: 'danger',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) return;
+            try {
+                const myRef = doc(db, "users", currentUser.uid);
+                const targetRef = doc(db, "users", targetUid);
+                await updateDoc(myRef, {
+                    blockedUsers: arrayUnion(targetUid),
+                    friends: arrayRemove(targetUid),
+                    friendRequests: arrayRemove(targetUid),
+                    sentRequests: arrayRemove(targetUid)
+                });
+                await updateDoc(targetRef, {
+                    friends: arrayRemove(currentUser.uid),
+                    friendRequests: arrayRemove(currentUser.uid),
+                    sentRequests: arrayRemove(currentUser.uid)
+                });
+                showToast("User blocked.", "error", "Blocked");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error blocking user:", err);
+                showToast("Failed to block user.", "error", "Action Failed");
+            }
+        };
+
+        window.unblockUser = async function(targetUid) {
+            const user = allMembersCache.find(u => u.id === targetUid);
+            const userName = user ? (user.name || user.displayName || 'this user') : 'this user';
+            const confirmed = await showConfirmModal({
+                type: 'success',
+                icon: '🔓',
+                title: 'Unblock User',
+                message: `Unblock ${escapeHTML(userName)}?`,
+                details: `They will be able to see your profile and send you friend requests again.`,
+                confirmText: 'Unblock',
+                confirmType: 'primary',
+                cancelText: 'Cancel'
+            });
+            if (!confirmed) return;
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    blockedUsers: arrayRemove(targetUid)
+                });
+                showToast("User unblocked.", "success", "Unblocked");
+                await loadMembers(true);
+                renderMemberDirectory();
+            } catch (err) {
+                console.error("Error unblocking user:", err);
+                showToast("Failed to unblock user.", "error", "Action Failed");
+            }
+        };
+
+        // === SEARCH INPUT ===
+        let searchTimeout = null;
+        document.getElementById('searchInput')?.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderMemberDirectory();
+            }, 300);
+        });
+
+        // === KEYBOARD SHORTCUTS ===
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        console.log("🔥 🚀 SPIKE Friends page loaded with enhanced features!");
+        console.log("📦 Cache Version:", CACHE_VERSION);
+        console.log("⌨️ Shortcut: Ctrl+F to focus search");
+    </script>
+</head>
+<body>
+
+    <header class="feed-header">
+        <a href="feed.html" class="logo">SPIKE</a>
+        <div class="user-nav">
+            <a href="administrator.html" class="nav-link admin-heart-link" id="adminNavLink" title="Admin Dashboard" onclick="goToAdmin()">
+                <span class="heart-icon">❤️</span>
+            </a>
+            <a href="community.html" class="nav-link" onclick="goToGroups()" title="Groups">🏠</a>
+            <a href="feed.html" class="nav-link" onclick="goToFeed()">📱 Feed</a>
+            <a href="chat.html" class="nav-link" onclick="goToMessages()">💬 Chat</a>
+            <a href="friends.html" class="nav-link active">👥 Friends</a>
+            <a href="profile.html" class="nav-link" onclick="goToProfile()">👤 Profile</a>
+        </div>
+    </header>
+
+    <main class="friends-main">
+        
+        <div class="section-card">
+            <div class="section-title">
+                Find Friends
+                <span class="badge" id="friendCount">0</span>
+            </div>
+            
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="all" onclick="switchTab('all')">🌐 All</button>
+                <button class="tab-btn" data-tab="friends" onclick="switchTab('friends')">👥 Friends</button>
+                <button class="tab-btn" data-tab="requests" onclick="switchTab('requests')">📩 Requests</button>
+                <button class="tab-btn" data-tab="blocked" onclick="switchTab('blocked')">🚫 Blocked</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search members by name... (Ctrl+F)" oninput="renderMemberDirectory()">
+                <button class="btn-action" onclick="renderMemberDirectory()">Search</button>
+            </div>
+            <div id="searchResults" class="user-list">
+                <div class="user-list-shimmer">
+                    <div class="shimmer-item">
+                        <div class="shimmer-avatar"></div>
+                        <div>
+                            <div class="shimmer-line" style="width:100px;margin-bottom:6px;"></div>
+                            <div class="shimmer-line" style="width:160px;"></div>
+                        </div>
+                        <div class="shimmer-line short"></div>
+                    </div>
+                    <div class="shimmer-item">
+                        <div class="shimmer-avatar"></div>
+                        <div>
+                            <div class="shimmer-line" style="width:120px;margin-bottom:6px;"></div>
+                            <div class="shimmer-line" style="width:140px;"></div>
+                        </div>
+                        <div class="shimmer-line short"></div>
+                    </div>
+                    <div class="shimmer-item">
+                        <div class="shimmer-avatar"></div>
+                        <div>
+                            <div class="shimmer-line" style="width:90px;margin-bottom:6px;"></div>
+                            <div class="shimmer-line" style="width:180px;"></div>
+                        </div>
+                        <div class="shimmer-line short"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- === CONFIRMATION MODAL === -->
+    <div id="confirmModalOverlay" class="confirm-modal-overlay">
+        <div id="confirmModal" class="confirm-modal warning">
+            <div class="confirm-modal-icon">
+                <span class="icon" id="confirmModalIcon">⚠️</span>
+            </div>
+            <div class="confirm-modal-title" id="confirmModalTitle">Are you sure?</div>
+            <div class="confirm-modal-message" id="confirmModalMessage">This action cannot be undone.</div>
+            <div class="confirm-modal-details" id="confirmModalDetails" style="display: none;"></div>
+            <div class="confirm-modal-actions">
+                <button class="btn-confirm secondary" id="confirmModalCancel" onclick="handleCancel()">Cancel</button>
+                <button class="btn-confirm danger" id="confirmModalConfirm" onclick="handleConfirm()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === TOAST === -->
+    <div id="globalToast" class="toast-container">
+        <div class="toast-content">
+            <div class="toast-icon-wrapper">
+                <span class="icon" id="toastIcon">✓</span>
+            </div>
+            <div class="toast-text-group">
+                <div class="toast-title" id="toastTitle">Success</div>
+                <div class="toast-message" id="toastMessage">Action completed successfully.</div>
+            </div>
+            <button class="toast-close-btn" onclick="dismissToast()">✕</button>
+            <div class="toast-progress"></div>
+        </div>
+    </div>
+
+    <footer class="feed-footer">
+        <p>&copy; 2026 SPIKE Ultra. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Admin — SPIKE Rooms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== ROOT ===== */
+        :root {
+            --bg-deep: #070b10;
+            --bg-surface: #0d1520;
+            --bg-card: rgba(20,32,48,0.7);
+            --bg-glass: rgba(13,21,32,0.85);
+            --border-color: rgba(255,255,255,0.08);
+            --border-glow: rgba(0,168,132,0.3);
+            --primary: #00a884;
+            --primary-hover: #00c29a;
+            --primary-glow: rgba(0,168,132,0.4);
+            --accent: #0ea5e9;
+            --error: #f43f5e;
+            --error-glow: rgba(244,63,94,0.4);
+            --success: #00a884;
+            --warning: #f59e0b;
+            --gold: #ffd700;
+            --elite: #f97316;
+            --elite-glow: rgba(249,115,22,0.3);
+            --premium: #7c3aed;
+            --premium-glow: rgba(124,58,237,0.3);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+            --transition: all 0.25s ease;
+            --radius: 16px;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-main);
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 12px 20px;
+        }
+
+        /* HEADER */
+        .admin-header {
+            width: 100%;
+            max-width: 800px;
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .admin-header .logo {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-main), var(--error));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .admin-header .logo .badge {
+            font-size: 0.6rem;
+            background: var(--error);
+            color: white;
+            padding: 0 8px;
+            border-radius: 12px;
+            -webkit-text-fill-color: white;
+        }
+        .admin-header .back {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            min-height: 36px;
+            min-width: 36px;
+            border-radius: 8px;
+        }
+        .admin-header .back:active { transform: scale(0.92); }
+
+        /* TABS */
+        .tabs {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-main);
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+            min-height: 40px;
+        }
+        .tab-btn:active { transform: scale(0.96); }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-btn:hover { color: var(--text-main); }
+
+        /* PANELS */
+        .panel {
+            width: 100%;
+            max-width: 800px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .panel.active { display: flex; }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+        .card .title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card .title .badge {
+            font-size: 0.65rem;
+            background: var(--primary);
+            color: #0d1520;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        /* SEARCH */
+        .search-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .search-row input {
+            flex: 1;
+            min-width: 160px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+            outline: none;
+            min-height: 40px;
+        }
+        .search-row input:focus {
+            border-color: var(--primary);
+        }
+        .search-row button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 40px;
+        }
+        .search-row button:active { transform: scale(0.95); }
+
+        /* USER RESULT (for coin search) */
+        .user-result {
+            display: none;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-result.active { display: flex; }
+        .user-result .info {
+            flex: 1;
+            min-width: 120px;
+        }
+        .user-result .info .name {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .user-result .info .spid {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .user-result .info .balance {
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 700;
+        }
+        .user-result .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .user-result .actions input {
+            width: 70px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            min-height: 32px;
+        }
+        .user-result .actions button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-weight: 700;
+            font-size: 0.7rem;
+            cursor: pointer;
+            min-height: 32px;
+        }
+        .user-result .actions button:active { transform: scale(0.95); }
+        .user-result .actions button.danger {
+            background: var(--error);
+        }
+        .user-result .actions button.gold {
+            background: var(--gold);
+            color: #0d1520;
+        }
+
+        .pack-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .pack-buttons button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 32px;
+        }
+        .pack-buttons button:active { transform: scale(0.92); }
+        .pack-buttons button:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* USER LIST */
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .user-item .info .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .user-item .info .spid {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .user-item .info .bal {
+            font-size: 0.7rem;
+            color: var(--gold);
+        }
+        .user-item .info .roles {
+            font-size: 0.6rem;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .user-item .info .roles .role {
+            background: rgba(0,168,132,0.1);
+            padding: 0 6px;
+            border-radius: 4px;
+            color: var(--primary);
+        }
+        .user-item .info .roles .role.elite {
+            background: rgba(249,115,22,0.1);
+            color: var(--elite);
+        }
+        .user-item .info .roles .role.premium {
+            background: rgba(124,58,237,0.1);
+            color: var(--premium);
+        }
+        .user-item .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .user-item .actions button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            min-height: 28px;
+        }
+        .user-item .actions button:active { transform: scale(0.95); }
+        .user-item .actions button.danger {
+            color: var(--error);
+            border-color: rgba(244,63,94,0.2);
+        }
+        .user-item .actions button.primary {
+            color: var(--primary);
+            border-color: rgba(0,168,132,0.2);
+        }
+        .user-item .actions button.gold {
+            color: var(--gold);
+            border-color: rgba(255,215,0,0.2);
+        }
+        .user-item .actions button.elite {
+            color: var(--elite);
+            border-color: rgba(249,115,22,0.2);
+        }
+        .user-item .actions button.premium {
+            color: var(--premium);
+            border-color: rgba(124,58,237,0.2);
+        }
+
+        /* ROOM LIST */
+        .room-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .room-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .room-item .info .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .room-item .info .meta {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .room-item .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .room-item .actions button {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            min-height: 28px;
+        }
+        .room-item .actions button:active { transform: scale(0.95); }
+        .room-item .actions button.danger {
+            color: var(--error);
+            border-color: rgba(244,63,94,0.2);
+        }
+        .room-item .actions button.primary {
+            color: var(--primary);
+            border-color: rgba(0,168,132,0.2);
+        }
+        .room-item .actions input {
+            width: 60px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 6px;
+            color: var(--text-main);
+            font-size: 0.7rem;
+            min-height: 28px;
+        }
+
+        /* CREATE ROOM */
+        .create-room-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .create-room-row input {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-family: var(--font-main);
+            min-height: 36px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .create-room-row input:focus {
+            border-color: var(--primary);
+        }
+        .create-room-row button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            min-height: 36px;
+        }
+        .create-room-row button:active { transform: scale(0.95); }
+
+        /* TRANSACTIONS */
+        .tx-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .tx-item .amount.positive { color: var(--success); }
+        .tx-item .amount.negative { color: var(--error); }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-box .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+        .stat-box .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ANNOUNCEMENT & MAINTENANCE TOGGLES */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toggle-row .toggle-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .toggle-row .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .toggle-row .toggle-switch.active {
+            background: var(--primary);
+        }
+        .toggle-row .toggle-switch .slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .toggle-row .toggle-switch.active .slider {
+            left: 25px;
+        }
+        .toggle-row .toggle-status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .announce-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+            min-height: 40px;
+            margin: 6px 0;
+        }
+        .announce-input:focus {
+            border-color: var(--primary);
+        }
+        .expiry-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .expiry-row input[type="datetime-local"] {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            min-height: 32px;
+        }
+        .expiry-row button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 4px 14px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            min-height: 32px;
+        }
+        .expiry-row button:active { transform: scale(0.95); }
+
+        /* ===== ANNOUNCEMENT PREVIEW ===== */
+        .announce-preview {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(0,168,132,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            white-space: nowrap;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .announce-preview.active {
+            display: flex;
+        }
+        .announce-preview .preview-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .announce-preview .preview-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* TOAST */
+        .toast-container {
+            position: fixed;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            z-index: 9999;
+            width: calc(100% - 32px);
+            max-width: 400px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
+            pointer-events: none;
+        }
+        .toast-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .toast-content {
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+        .toast-content .icon { font-size: 1.2rem; }
+        .toast-content .msg { flex: 1; font-size: 0.85rem; font-weight: 500; }
+        .toast-content .close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .admin-header { padding: 8px 0; }
+            .tab-btn { font-size: 0.7rem; padding: 6px 10px; }
+            .search-row input { font-size: 0.8rem; }
+            .user-result .actions input { width: 60px; }
+            .create-room-row input { min-width: 100px; }
+        }
+        @media (pointer: coarse) {
+            .tab-btn, .search-row button, .user-result .actions button,
+            .pack-buttons button, .user-item .actions button,
+            .room-item .actions button,
+            .toggle-row .toggle-switch, .expiry-row button,
+            .create-room-row button, .create-room-row input {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="admin-header">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button class="back" onclick="window.location.href='administrator.html'">‹</button>
+            <span class="logo">⚙️ Admin <span class="badge">Control</span></span>
+        </div>
+        <span style="font-size:0.8rem;color:var(--text-muted);" id="adminEmail">Admin</span>
+    </header>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="coins" onclick="switchTab('coins')">🪙 Coins</button>
+        <button class="tab-btn" data-tab="users" onclick="switchTab('users')">👥 Users</button>
+        <button class="tab-btn" data-tab="rooms" onclick="switchTab('rooms')">🏠 Rooms</button>
+        <button class="tab-btn" data-tab="earnings" onclick="switchTab('earnings')">💰 Earnings</button>
+        <button class="tab-btn" data-tab="transactions" onclick="switchTab('transactions')">📜 Transactions</button>
+        <button class="tab-btn" data-tab="announcement" onclick="switchTab('announcement')">📢 Announcement</button>
+        <button class="tab-btn" data-tab="maintenance" onclick="switchTab('maintenance')">🛠️ Maintenance</button>
+    </div>
+
+    <!-- PANELS -->
+
+    <!-- COINS PANEL -->
+    <div class="panel active" id="panel-coins">
+        <div class="card">
+            <div class="title">🔍 Find User by SPIKE ID</div>
+            <div class="search-row">
+                <input type="text" id="coinSearchInput" placeholder="Enter SPIKE ID (e.g., 123456)" />
+                <button onclick="searchUserForCoins()">Search</button>
+            </div>
+            <div class="user-result" id="coinUserResult">
+                <div class="info">
+                    <div class="name" id="coinUserName">—</div>
+                    <div class="spid" id="coinUserSpId">SP: —</div>
+                    <div class="balance" id="coinUserBalance">🪙 0</div>
+                </div>
+                <div class="actions">
+                    <input type="number" id="coinAmount" placeholder="Amount" min="1" />
+                    <button onclick="addCoins()">➕ Add</button>
+                    <button class="danger" onclick="removeCoins()">➖ Remove</button>
+                </div>
+                <div class="pack-buttons" style="width:100%;">
+                    <button onclick="addPack(50)">+50</button>
+                    <button onclick="addPack(100)">+100</button>
+                    <button onclick="addPack(500)">+500</button>
+                    <button onclick="addPack(1000)">+1000</button>
+                    <button onclick="removePack(50)">-50</button>
+                    <button onclick="removePack(100)">-100</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USERS PANEL -->
+    <div class="panel" id="panel-users">
+        <div class="card">
+            <div class="title">👥 All Users <span class="badge" id="userCount">0</span></div>
+            <div class="search-row">
+                <input type="text" id="userSearchInput" placeholder="Search by name or SPIKE ID..." />
+                <button onclick="searchUsers()">Search</button>
+                <button onclick="loadAllUsers()">Refresh</button>
+            </div>
+            <div class="user-list" id="userList">
+                <div style="text-align:center;color:var(--text-muted);padding:20px;">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROOMS PANEL -->
+    <div class="panel" id="panel-rooms">
+        <div class="card">
+            <div class="title">🏠 All Rooms</div>
+            <button onclick="loadRooms()" style="background:var(--primary);color:white;border:none;border-radius:8px;padding:6px 14px;font-weight:700;cursor:pointer;min-height:36px;margin-bottom:8px;">Refresh</button>
+            <div class="room-list" id="roomList">
+                <div style="text-align:center;color:var(--text-muted);padding:20px;">Loading rooms...</div>
+            </div>
+            <div class="create-room-row">
+                <input type="text" id="roomNameInput" placeholder="Room name" />
+                <input type="number" id="roomFeeInput" placeholder="Entry fee" value="50" min="1" style="max-width:120px;" />
+                <button onclick="createRoom()">➕ Create Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EARNINGS PANEL (upgraded with Premium Cuts) -->
+    <div class="panel" id="panel-earnings">
+        <div class="card">
+            <div class="title">💰 Admin Earnings</div>
+            <div class="stats-grid" id="earningsStats">
+                <div class="stat-box"><div class="value" id="totalEarnings">0</div><div class="label">Total 🪙</div></div>
+                <div class="stat-box"><div class="value" id="totalGiftCut">0</div><div class="label">Gift Cuts</div></div>
+                <div class="stat-box"><div class="value" id="totalRaffleCut">0</div><div class="label">Raffle Cuts</div></div>
+                <div class="stat-box"><div class="value" id="totalVIPCut">0</div><div class="label">VIP Cuts</div></div>
+                <div class="stat-box"><div class="value" id="totalPremiumCut">0</div><div class="label">Premium Cuts</div></div>
+                <div class="stat-box"><div class="value" id="totalELITECut">0</div><div class="label">ELITE Cuts</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS PANEL -->
+    <div class="panel" id="panel-transactions">
+        <div class="card">
+            <div class="title">📜 Recent Transactions</div>
+            <div class="search-row">
+                <input type="text" id="txSearchInput" placeholder="User SPIKE ID" />
+                <button onclick="loadTransactions()">Search</button>
+                <button onclick="loadTransactions('all')">All</button>
+            </div>
+            <div class="tx-list" id="txList">
+                <div style="text-align:center;color:var(--text-muted);padding:20px;">Loading transactions...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANNOUNCEMENT PANEL -->
+    <div class="panel" id="panel-announcement">
+        <div class="card">
+            <div class="title">📢 Global Announcement <span class="badge">Live</span></div>
+            <div class="toggle-row" style="margin-bottom:8px;">
+                <span class="toggle-label">Active</span>
+                <div class="toggle-switch" id="announceToggle" onclick="toggleAnnouncement()">
+                    <div class="slider"></div>
+                </div>
+                <span class="toggle-status" id="announceStatus">Inactive</span>
+            </div>
+            <textarea class="announce-input" id="announceText" rows="2" placeholder="Enter announcement text..."></textarea>
+            <div class="expiry-row">
+                <label style="font-size:0.8rem;color:var(--text-muted);">Expiry:</label>
+                <input type="datetime-local" id="announceExpiry" />
+                <button onclick="saveAnnouncement()">Save</button>
+                <button onclick="clearAnnouncement()" style="background:var(--error);">Clear</button>
+                <button onclick="testAnnouncement()" style="background:var(--accent);">Test</button>
+            </div>
+            <div class="announce-preview" id="announcePreview">
+                <span class="preview-icon">📢</span>
+                <span class="preview-text" id="announcePreviewText">Preview will appear here</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAINTENANCE PANEL -->
+    <div class="panel" id="panel-maintenance">
+        <div class="card">
+            <div class="title">🛠️ Maintenance Mode</div>
+            <div class="toggle-row">
+                <span class="toggle-label">Enable Maintenance</span>
+                <div class="toggle-switch" id="maintenanceToggle" onclick="toggleMaintenance()">
+                    <div class="slider"></div>
+                </div>
+                <span class="toggle-status" id="maintenanceStatus">Disabled</span>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.8rem;margin-top:8px;">When enabled, only admin can access the app. All other users will be redirected to a maintenance page.</p>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toast">
+        <div class="toast-content">
+            <span class="icon" id="toastIcon">✓</span>
+            <span class="msg" id="toastMsg">Done</span>
+            <button class="close" onclick="dismissToast()">✕</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // ============================================================
+        // ADMIN_ROOMS.JS — Complete Admin Control (SP ID based)
+        // ============================================================
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import {
+            getFirestore, collection, doc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy,
+            where, setDoc, serverTimestamp, runTransaction, increment
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const CONFIG = {
+            apiKey: "AIzaSyAm8ghbQ_lwJdNXEhWGos0eyi5wtvGuRR4",
+            authDomain: "grazzy-9e736.firebaseapp.com",
+            projectId: "grazzy-9e736",
+            storageBucket: "grazzy-9e736.firebasestorage.app",
+            messagingSenderId: "750326949170",
+            appId: "1:750326949170:web:5d19744aafc8675918632b"
+        };
+        const app = initializeApp(CONFIG);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAILS = ["eletexjoeytex@gmail.com"];
+
+        let currentUser = null;
+        let isAdmin = false;
+        let selectedUserDoc = null; // { id, data } for coin operations
+        let toastTimeout = null;
+
+        // ===== TOAST =====
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msgEl = document.getElementById('toastMsg');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            t.className = 'toast-container';
+            icon.textContent = type === 'success' ? '✓' : '✕';
+            msgEl.textContent = msg;
+            void t.offsetWidth;
+            t.classList.add('active');
+            toastTimeout = setTimeout(() => { t.classList.remove('active'); }, 3000);
+        }
+        window.dismissToast = function() {
+            document.getElementById('toast').classList.remove('active');
+            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+        };
+
+        // ===== TAB SWITCHING =====
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${tab}`).classList.add('active');
+        };
+
+        // ===== HELPERS =====
+        function escapeHTML(s) {
+            return String(s || '').replace(/[&<>'"]/g, t =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)
+            );
+        }
+
+        // ===== FIND USER BY SP ID =====
+        async function findUserBySpId(spId) {
+            if (!spId) return null;
+            const q = query(collection(db, 'users'), where('spId', '==', spId));
+            const snap = await getDocs(q);
+            if (snap.empty) return null;
+            return { id: snap.docs[0].id, data: snap.docs[0].data() };
+        }
+
+        // ===== COIN MANAGEMENT =====
+        window.searchUserForCoins = async function() {
+            const input = document.getElementById('coinSearchInput');
+            const spId = input.value.trim();
+            if (!spId) { showToast('Enter a SPIKE ID', 'warning'); return; }
+
+            const resultDiv = document.getElementById('coinUserResult');
+            try {
+                const user = await findUserBySpId(spId);
+                if (!user) {
+                    showToast('User not found', 'error');
+                    resultDiv.classList.remove('active');
+                    return;
+                }
+                const data = user.data;
+                const name = data.name || data.displayName || 'User';
+                const spIdDisplay = data.spId || 'N/A';
+                const balance = data.coins || 0;
+
+                document.getElementById('coinUserName').textContent = name;
+                document.getElementById('coinUserSpId').textContent = `SP: ${spIdDisplay}`;
+                document.getElementById('coinUserBalance').textContent = `🪙 ${balance}`;
+                selectedUserDoc = { id: user.id, data: data };
+                resultDiv.classList.add('active');
+                showToast('User found', 'success');
+            } catch (e) {
+                showToast('Error searching user', 'error');
+                console.error(e);
+            }
+        };
+
+        window.addCoins = async function() {
+            if (!selectedUserDoc) { showToast('Search a user first', 'warning'); return; }
+            const amountInput = document.getElementById('coinAmount');
+            const amount = parseInt(amountInput.value);
+            if (!amount || amount <= 0) { showToast('Enter a valid amount', 'warning'); return; }
+            await modifyCoins(amount, true);
+            amountInput.value = '';
+        };
+
+        window.removeCoins = async function() {
+            if (!selectedUserDoc) { showToast('Search a user first', 'warning'); return; }
+            const amountInput = document.getElementById('coinAmount');
+            const amount = parseInt(amountInput.value);
+            if (!amount || amount <= 0) { showToast('Enter a valid amount', 'warning'); return; }
+            await modifyCoins(amount, false);
+            amountInput.value = '';
+        };
+
+        window.addPack = async function(amount) {
+            if (!selectedUserDoc) { showToast('Search a user first', 'warning'); return; }
+            await modifyCoins(amount, true);
+        };
+        window.removePack = async function(amount) {
+            if (!selectedUserDoc) { showToast('Search a user first', 'warning'); return; }
+            await modifyCoins(amount, false);
+        };
+
+        async function modifyCoins(amount, isAdd) {
+            const uid = selectedUserDoc.id;
+            const ref = doc(db, 'users', uid);
+            try {
+                await runTransaction(db, async (tx) => {
+                    const snap = await tx.get(ref);
+                    if (!snap.exists()) throw new Error('User no longer exists');
+                    const cur = snap.data().coins || 0;
+                    const newBal = isAdd ? cur + amount : cur - amount;
+                    if (newBal < 0) throw new Error('Insufficient coins');
+                    tx.update(ref, { coins: newBal });
+                    const txRef = collection(db, 'transactions');
+                    await tx.set(doc(txRef), {
+                        userId: uid,
+                        spId: snap.data().spId || '',
+                        amount: isAdd ? amount : -amount,
+                        newBalance: newBal,
+                        reason: isAdd ? `Admin added ${amount} coins` : `Admin removed ${amount} coins`,
+                        adminId: currentUser.uid,
+                        timestamp: serverTimestamp()
+                    });
+                });
+                const snap = await getDoc(ref);
+                const newBal = snap.data().coins || 0;
+                document.getElementById('coinUserBalance').textContent = `🪙 ${newBal}`;
+                showToast(`Coins updated`, 'success');
+                if (document.getElementById('panel-users').classList.contains('active')) loadAllUsers();
+            } catch (e) {
+                showToast(e.message || 'Operation failed', 'error');
+            }
+        }
+
+        // ===== USER MANAGEMENT =====
+        async function loadAllUsers() {
+            const list = document.getElementById('userList');
+            list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</div>';
+            try {
+                const snap = await getDocs(collection(db, 'users'));
+                if (snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">No users</div>'; return; }
+                let html = '';
+                let count = 0;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const spId = data.spId || 'N/A';
+                    const name = data.name || data.displayName || 'User';
+                    const bal = data.coins || 0;
+                    const suspended = data.suspended === true;
+                    const vip = data.vip === true;
+                    const premium = data.premium === true;
+                    const elite = data.elite === true;
+                    const mod = data.moderator === true;
+                    count++;
+                    html += `
+                        <div class="user-item" data-uid="${doc.id}">
+                            <div class="info">
+                                <div class="name">${escapeHTML(name)} ${suspended ? '🚫' : ''}</div>
+                                <div class="spid">SP: ${escapeHTML(spId)}</div>
+                                <div class="bal">🪙 ${bal}</div>
+                                <div class="roles">
+                                    ${vip ? '<span class="role">👑 VIP</span>' : ''}
+                                    ${premium ? '<span class="role premium">⭐ Premium</span>' : ''}
+                                    ${elite ? '<span class="role elite">🔥 ELITE</span>' : ''}
+                                    ${mod ? '<span class="role">🛡️ Mod</span>' : ''}
+                                    ${suspended ? '<span class="role" style="color:var(--error);">🚫 Suspended</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="primary" onclick="viewUser('${escapeHTML(spId)}')">👤</button>
+                                <button class="gold" onclick="toggleRole('${doc.id}', 'vip', ${vip})">${vip ? 'Un-VIP' : 'VIP'}</button>
+                                <button class="premium" onclick="toggleRole('${doc.id}', 'premium', ${premium})">${premium ? 'Un-Premium' : 'Premium'}</button>
+                                <button class="elite" onclick="toggleRole('${doc.id}', 'elite', ${elite})">${elite ? 'Un-ELITE' : 'ELITE'}</button>
+                                <button class="primary" onclick="toggleRole('${doc.id}', 'moderator', ${mod})">${mod ? 'Un-Mod' : 'Mod'}</button>
+                                <button ${suspended ? 'class="primary"' : 'class="danger"'} onclick="toggleSuspend('${doc.id}', ${suspended})">
+                                    ${suspended ? 'Unsuspend' : 'Suspend'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+                document.getElementById('userCount').textContent = count;
+            } catch (e) {
+                list.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;">Failed to load users</div>';
+                console.error(e);
+            }
+        }
+
+        window.toggleRole = async function(uid, role, current) {
+            try {
+                await updateDoc(doc(db, 'users', uid), { [role]: !current });
+                showToast(`${role} toggled`, 'success');
+                loadAllUsers();
+            } catch (e) {
+                showToast('Failed to update role', 'error');
+            }
+        };
+
+        window.viewUser = async function(spId) {
+            switchTab('coins');
+            document.getElementById('coinSearchInput').value = spId;
+            await searchUserForCoins();
+        };
+
+        window.toggleSuspend = async function(uid, currentlySuspended) {
+            const confirmMsg = currentlySuspended ? 'Unsuspend this user?' : 'Suspend this user?';
+            if (!confirm(confirmMsg)) return;
+            try {
+                await updateDoc(doc(db, 'users', uid), { suspended: !currentlySuspended });
+                showToast(`User ${currentlySuspended ? 'unsuspended' : 'suspended'}`, 'success');
+                loadAllUsers();
+            } catch (e) {
+                showToast('Failed to update', 'error');
+            }
+        };
+
+        window.searchUsers = async function() {
+            const queryStr = document.getElementById('userSearchInput').value.trim();
+            if (!queryStr) { loadAllUsers(); return; }
+            const list = document.getElementById('userList');
+            list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">Searching...</div>';
+            try {
+                const qName = query(collection(db, 'users'), where('name', '>=', queryStr), where('name', '<=', queryStr + '\uf8ff'));
+                const qSpId = query(collection(db, 'users'), where('spId', '==', queryStr));
+                const [snapName, snapSpId] = await Promise.all([getDocs(qName), getDocs(qSpId)]);
+                let results = [];
+                snapName.forEach(d => results.push({ id: d.id, ...d.data() }));
+                snapSpId.forEach(d => {
+                    if (!results.find(r => r.id === d.id)) results.push({ id: d.id, ...d.data() });
+                });
+                if (results.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">No users found</div>';
+                    return;
+                }
+                let html = '';
+                results.forEach(data => {
+                    const spId = data.spId || 'N/A';
+                    const name = data.name || data.displayName || 'User';
+                    const bal = data.coins || 0;
+                    const suspended = data.suspended === true;
+                    const vip = data.vip === true;
+                    const premium = data.premium === true;
+                    const elite = data.elite === true;
+                    const mod = data.moderator === true;
+                    html += `
+                        <div class="user-item" data-uid="${data.id}">
+                            <div class="info">
+                                <div class="name">${escapeHTML(name)} ${suspended ? '🚫' : ''}</div>
+                                <div class="spid">SP: ${escapeHTML(spId)}</div>
+                                <div class="bal">🪙 ${bal}</div>
+                                <div class="roles">
+                                    ${vip ? '<span class="role">👑 VIP</span>' : ''}
+                                    ${premium ? '<span class="role premium">⭐ Premium</span>' : ''}
+                                    ${elite ? '<span class="role elite">🔥 ELITE</span>' : ''}
+                                    ${mod ? '<span class="role">🛡️ Mod</span>' : ''}
+                                    ${suspended ? '<span class="role" style="color:var(--error);">🚫 Suspended</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="primary" onclick="viewUser('${escapeHTML(spId)}')">👤</button>
+                                <button class="gold" onclick="toggleRole('${data.id}', 'vip', ${vip})">${vip ? 'Un-VIP' : 'VIP'}</button>
+                                <button class="premium" onclick="toggleRole('${data.id}', 'premium', ${premium})">${premium ? 'Un-Premium' : 'Premium'}</button>
+                                <button class="elite" onclick="toggleRole('${data.id}', 'elite', ${elite})">${elite ? 'Un-ELITE' : 'ELITE'}</button>
+                                <button class="primary" onclick="toggleRole('${data.id}', 'moderator', ${mod})">${mod ? 'Un-Mod' : 'Mod'}</button>
+                                <button ${suspended ? 'class="primary"' : 'class="danger"'} onclick="toggleSuspend('${data.id}', ${suspended})">
+                                    ${suspended ? 'Unsuspend' : 'Suspend'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (e) {
+                list.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;">Search failed</div>';
+                console.error(e);
+            }
+        };
+
+        // ===== ROOMS MANAGEMENT =====
+        async function loadRooms() {
+            const list = document.getElementById('roomList');
+            list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</div>';
+            try {
+                const snap = await getDocs(collection(db, 'rooms'));
+                if (snap.empty) { list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">No rooms</div>'; return; }
+                let html = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const name = data.name || 'Unnamed';
+                    const fee = data.entryFee || 10;
+                    const count = data.participantCount || 0;
+                    html += `
+                        <div class="room-item">
+                            <div class="info">
+                                <div class="name">🏠 ${escapeHTML(name)}</div>
+                                <div class="meta">Fee: ${fee} 🪙 | 👥 ${count} | Owner: ${escapeHTML(data.createdBy || 'Unknown')}</div>
+                            </div>
+                            <div class="actions">
+                                <input type="number" id="feeInput_${id}" value="${fee}" min="1" style="width:60px;" />
+                                <button class="primary" onclick="setRoomFee('${id}')">Set Fee</button>
+                                <button class="danger" onclick="deleteRoom('${id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (e) {
+                list.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;">Failed to load rooms</div>';
+                console.error(e);
+            }
+        }
+
+        window.setRoomFee = async function(roomId) {
+            const input = document.getElementById(`feeInput_${roomId}`);
+            const fee = parseInt(input.value);
+            if (!fee || fee < 1) { showToast('Invalid fee', 'warning'); return; }
+            try {
+                await updateDoc(doc(db, 'rooms', roomId), { entryFee: fee });
+                showToast('Fee updated', 'success');
+                loadRooms();
+            } catch (e) {
+                showToast('Failed to update fee', 'error');
+            }
+        };
+
+        window.deleteRoom = async function(roomId) {
+            if (!confirm('Delete this room and all its messages?')) return;
+            try {
+                const msgSnap = await getDocs(collection(db, 'rooms', roomId, 'messages'));
+                for (const d of msgSnap.docs) await deleteDoc(d.ref);
+                const partSnap = await getDocs(collection(db, 'rooms', roomId, 'participants'));
+                for (const d of partSnap.docs) await deleteDoc(d.ref);
+                await deleteDoc(doc(db, 'rooms', roomId));
+                showToast('Room deleted', 'success');
+                loadRooms();
+            } catch (e) {
+                showToast('Failed to delete room', 'error');
+                console.error(e);
+            }
+        };
+
+        window.createRoom = async function() {
+            const nameInput = document.getElementById('roomNameInput');
+            const feeInput = document.getElementById('roomFeeInput');
+            const name = nameInput.value.trim();
+            const fee = parseInt(feeInput.value);
+            if (!name) { showToast('Enter a room name', 'warning'); return; }
+            if (!fee || fee < 1) { showToast('Enter a valid entry fee', 'warning'); return; }
+            try {
+                const roomRef = doc(collection(db, 'rooms'));
+                await setDoc(roomRef, {
+                    name: name,
+                    entryFee: fee,
+                    createdBy: currentUser.uid,
+                    participantCount: 0,
+                    createdAt: serverTimestamp()
+                });
+                showToast('Room created', 'success');
+                nameInput.value = '';
+                feeInput.value = '50';
+                loadRooms();
+            } catch (e) {
+                showToast('Failed to create room', 'error');
+                console.error(e);
+            }
+        };
+
+        // ===== EARNINGS (updated with Premium Cuts) =====
+        async function loadEarnings() {
+            try {
+                const txSnap = await getDocs(collection(db, 'transactions'));
+                let totalEarnings = 0;
+                let giftCut = 0;
+                let raffleCut = 0;
+                let vipCut = 0;
+                let premiumCut = 0;
+                let eliteCut = 0;
+                txSnap.forEach(d => {
+                    const data = d.data();
+                    const amount = data.amount || 0;
+                    const reason = data.reason || '';
+                    if (reason.includes('Gift cut')) giftCut += Math.abs(amount);
+                    else if (reason.includes('Raffle cut')) raffleCut += Math.abs(amount);
+                    else if (reason.includes('VIP cut')) vipCut += Math.abs(amount);
+                    else if (reason.includes('Premium cut')) premiumCut += Math.abs(amount);
+                    else if (reason.includes('ELITE cut')) eliteCut += Math.abs(amount);
+                    if (reason.includes('cut') || reason.includes('admin')) {
+                        if (amount > 0) totalEarnings += amount;
+                    }
+                });
+                document.getElementById('totalEarnings').textContent = totalEarnings;
+                document.getElementById('totalGiftCut').textContent = giftCut;
+                document.getElementById('totalRaffleCut').textContent = raffleCut;
+                document.getElementById('totalVIPCut').textContent = vipCut;
+                document.getElementById('totalPremiumCut').textContent = premiumCut;
+                document.getElementById('totalELITECut').textContent = eliteCut;
+            } catch (e) {
+                console.error('Earnings error:', e);
+            }
+        }
+
+        // ===== TRANSACTIONS =====
+        window.loadTransactions = async function(filter = '') {
+            const list = document.getElementById('txList');
+            list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">Loading...</div>';
+            try {
+                let q = query(collection(db, 'transactions'), orderBy('timestamp', 'desc'), limit(100));
+                const searchVal = document.getElementById('txSearchInput').value.trim();
+                if (searchVal && filter !== 'all') {
+                    q = query(collection(db, 'transactions'), where('spId', '==', searchVal), orderBy('timestamp', 'desc'), limit(100));
+                }
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">No transactions</div>';
+                    return;
+                }
+                let html = '';
+                snap.forEach(d => {
+                    const data = d.data();
+                    const amount = data.amount || 0;
+                    const reason = data.reason || '';
+                    const time = data.timestamp?.toDate?.() || new Date();
+                    const timeStr = time.toLocaleString();
+                    const userId = data.spId || data.userId || 'unknown';
+                    const isPositive = amount > 0;
+                    html += `
+                        <div class="tx-item">
+                            <span>${escapeHTML(reason)}</span>
+                            <span>SP: ${escapeHTML(userId)}</span>
+                            <span class="amount ${isPositive ? 'positive' : 'negative'}">${isPositive ? '+' : ''}${amount} 🪙</span>
+                            <span style="font-size:0.6rem;">${timeStr}</span>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            } catch (e) {
+                list.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;">Failed to load</div>';
+                console.error(e);
+            }
+        };
+
+        // ===== ANNOUNCEMENT =====
+        async function loadAnnouncement() {
+            try {
+                const snap = await getDoc(doc(db, 'settings', 'announcement'));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('announceText').value = data.text || '';
+                    document.getElementById('announceToggle').classList.toggle('active', data.active === true);
+                    document.getElementById('announceStatus').textContent = data.active ? 'Active' : 'Inactive';
+                    if (data.expiry) {
+                        const d = new Date(data.expiry);
+                        if (!isNaN(d.getTime())) {
+                            document.getElementById('announceExpiry').value = d.toISOString().slice(0, 16);
+                        }
+                    }
+                    updatePreview(data.text || '');
+                }
+            } catch (e) { console.error('Announcement load error:', e); }
+        }
+
+        function updatePreview(text) {
+            const preview = document.getElementById('announcePreview');
+            const previewText = document.getElementById('announcePreviewText');
+            if (text && text.trim() !== '') {
+                preview.classList.add('active');
+                previewText.textContent = text;
+            } else {
+                preview.classList.remove('active');
+            }
+        }
+
+        window.toggleAnnouncement = function() {
+            const toggle = document.getElementById('announceToggle');
+            toggle.classList.toggle('active');
+            const active = toggle.classList.contains('active');
+            document.getElementById('announceStatus').textContent = active ? 'Active' : 'Inactive';
+            const text = document.getElementById('announceText').value.trim();
+            updatePreview(text);
+        };
+
+        window.saveAnnouncement = async function() {
+            const text = document.getElementById('announceText').value.trim();
+            const active = document.getElementById('announceToggle').classList.contains('active');
+            const expiry = document.getElementById('announceExpiry').value;
+            const payload = { text, active, expiry: expiry || null, updatedAt: serverTimestamp() };
+            try {
+                await setDoc(doc(db, 'settings', 'announcement'), payload);
+                showToast('Announcement saved', 'success');
+                updatePreview(text);
+            } catch (e) {
+                showToast('Failed to save', 'error');
+            }
+        };
+
+        window.clearAnnouncement = function() {
+            if (!confirm('Clear the announcement?')) return;
+            document.getElementById('announceText').value = '';
+            document.getElementById('announceExpiry').value = '';
+            document.getElementById('announceToggle').classList.remove('active');
+            document.getElementById('announceStatus').textContent = 'Inactive';
+            updatePreview('');
+            saveAnnouncement();
+        };
+
+        window.testAnnouncement = function() {
+            const text = document.getElementById('announceText').value.trim();
+            if (!text) { showToast('Enter announcement text first', 'warning'); return; }
+            showToast(`📢 TEST: ${text}`, 'success');
+        };
+
+        // ===== MAINTENANCE =====
+        async function loadMaintenance() {
+            try {
+                const snap = await getDoc(doc(db, 'settings', 'maintenance'));
+                if (snap.exists()) {
+                    const active = snap.data().active === true;
+                    document.getElementById('maintenanceToggle').classList.toggle('active', active);
+                    document.getElementById('maintenanceStatus').textContent = active ? 'Enabled' : 'Disabled';
+                }
+            } catch (e) { console.error('Maintenance load error:', e); }
+        }
+
+        window.toggleMaintenance = function() {
+            const toggle = document.getElementById('maintenanceToggle');
+            toggle.classList.toggle('active');
+            const active = toggle.classList.contains('active');
+            document.getElementById('maintenanceStatus').textContent = active ? 'Enabled' : 'Disabled';
+            saveMaintenance(active);
+        };
+
+        async function saveMaintenance(active) {
+            try {
+                await setDoc(doc(db, 'settings', 'maintenance'), { active, updatedAt: serverTimestamp() });
+                showToast(active ? 'Maintenance enabled' : 'Maintenance disabled', 'success');
+            } catch (e) {
+                showToast('Failed to update', 'error');
+            }
+        }
+
+        // ===== AUTH =====
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            currentUser = user;
+            if (!ADMIN_EMAILS.includes(user.email?.toLowerCase())) {
+                document.body.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:20px;">
+                        <div style="font-size:3rem;margin-bottom:12px;">⛔</div>
+                        <h1 style="font-weight:800;font-size:1.5rem;">Access Denied</h1>
+                        <p style="color:var(--text-muted);margin:8px 0;">You are not authorized to view this page.</p>
+                        <button onclick="window.location.href='feed.html'" style="background:var(--primary);color:white;border:none;padding:10px 24px;border-radius:10px;font-weight:700;cursor:pointer;margin-top:12px;">Go to Feed</button>
+                    </div>
+                `;
+                return;
+            }
+            isAdmin = true;
+            document.getElementById('adminEmail').textContent = user.email;
+
+            await Promise.all([
+                loadAllUsers(),
+                loadRooms(),
+                loadEarnings(),
+                loadTransactions(),
+                loadAnnouncement(),
+                loadMaintenance()
+            ]);
+
+            document.getElementById('announceText').addEventListener('input', function() {
+                updatePreview(this.value);
+            });
+
+            document.getElementById('coinSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') searchUserForCoins(); });
+            document.getElementById('userSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') searchUsers(); });
+            document.getElementById('txSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') loadTransactions(); });
+        });
+
+        console.log('⚙️ Admin Control Panel loaded — full tier and room management');
+    </script>
+</body>
+</html>

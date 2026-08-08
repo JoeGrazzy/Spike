@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>SPIKE AI — Real‑time Companion</title>
+    <meta name="description" content="SPIKE AI – your smart, real‑time companion powered by Groq and Firebase." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -479,29 +480,6 @@
         .lock-badge .icon {
             font-size: 0.7rem;
         }
-        .back-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: clamp(0.8rem, 2vw, 0.85rem);
-            font-weight: 600;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 8px;
-            transition: var(--transition);
-            font-family: var(--font-main);
-            min-height: 36px;
-            display: flex;
-            align-items: center;
-            touch-action: manipulation;
-        }
-        .back-btn:active {
-            transform: scale(0.95);
-        }
-        .back-btn:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
-        }
         .logo {
             font-size: clamp(1rem, 3.5vw, 1.2rem);
             font-weight: 800;
@@ -509,7 +487,7 @@
             background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            cursor: pointer;
+            cursor: default;
             text-decoration: none;
         }
 
@@ -964,10 +942,6 @@
                 margin-left: 0;
                 justify-content: center;
             }
-            .back-btn {
-                font-size: 0.7rem;
-                padding: 4px 8px;
-            }
             .logo {
                 font-size: 0.9rem;
             }
@@ -1012,7 +986,6 @@
             }
         }
         @media (pointer: coarse) {
-            .back-btn,
             .file-btn,
             .send-btn,
             .btn-confirm,
@@ -1184,7 +1157,7 @@
             color: var(--success);
         }
 
-        /* ─── FIREBASE CONFIG MODAL (kept for manual override) ─── */
+        /* ─── FIREBASE CONFIG OVERLAY (manual override) ─── */
         .fb-config-overlay {
             position: fixed;
             inset: 0;
@@ -1409,8 +1382,7 @@
     <!-- ─── HEADER ─── -->
     <header class="chat-header">
         <div class="header-left">
-            <button class="back-btn" onclick="window.location.href='feed.html'">← Back</button>
-            <a href="feed.html" class="logo">SPIKE</a>
+            <span class="logo">SPIKE</span>
         </div>
         <div class="header-right">
             <div class="rt-badge" id="rtBadge">
@@ -1505,7 +1477,7 @@
         </div>
     </div>
 
-    <!-- ─── FIREBASE CONFIG OVERLAY (kept for manual override) ─── -->
+    <!-- ─── FIREBASE CONFIG OVERLAY (manual override) ─── -->
     <div class="fb-config-overlay" id="fbConfigOverlay">
         <div class="fb-config-card" onclick="event.stopPropagation()">
             <div class="fb-icon">🔥</div>
@@ -1712,7 +1684,6 @@
                 if (firebase.apps.length === 0) {
                     firebase.initializeApp(config);
                 } else {
-                    // Check if already initialized with same project
                     const app = firebase.app();
                     if (app.options.projectId !== config.projectId) {
                         firebase.initializeApp(config, 'spike_ai');
@@ -1771,7 +1742,6 @@
             rtStatus.textContent = 'Syncing…';
 
             messagesUnsubscribe = getMessagesRef().onSnapshot((snapshot) => {
-                // Clear existing messages (keep the welcome if no messages)
                 const existingMsgs = chatContainer.querySelectorAll('.msg:not(.keep-welcome)');
                 existingMsgs.forEach(el => el.remove());
 
@@ -1907,7 +1877,6 @@
         // ─── LOAD API KEY (hardcoded → Firestore → localStorage) ────
 
         async function loadApiKey() {
-            // 1. Hardcoded key (highest priority)
             if (HARDCODED_API_KEY && isKeyValid(HARDCODED_API_KEY)) {
                 GROQ_API_KEY = HARDCODED_API_KEY.trim();
                 setStoredKey(GROQ_API_KEY);
@@ -1916,7 +1885,6 @@
                 return true;
             }
 
-            // 2. Firestore (if initialized)
             if (fbInitialized && db) {
                 const firestoreKey = await loadApiKeyFromFirestore();
                 if (firestoreKey && isKeyValid(firestoreKey)) {
@@ -1928,7 +1896,6 @@
                 }
             }
 
-            // 3. localStorage
             const stored = getStoredKey();
             if (stored && isKeyValid(stored)) {
                 GROQ_API_KEY = stored.trim();
@@ -1940,7 +1907,6 @@
                 return true;
             }
 
-            // 4. No key — show lock overlay
             showKeyLockOverlay();
             return false;
         }
@@ -2002,11 +1968,10 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // ─── FIREBASE CONFIG OVERLAY (kept for manual override) ──────
+        // ─── FIREBASE CONFIG OVERLAY ──────────────────────────────────
 
         function showFbConfigOverlay() {
             fbConfigOverlay.classList.add('active');
-            // Pre-fill with hardcoded config if available
             if (HARDCODED_FIREBASE_CONFIG && HARDCODED_FIREBASE_CONFIG.apiKey) {
                 fbConfigInput.value = JSON.stringify(HARDCODED_FIREBASE_CONFIG, null, 4);
                 fbStatus.textContent = '✅ Config pre-filled. Click Connect to use it.';
@@ -2579,7 +2544,6 @@
         async function boot() {
             console.log('⚡ SPIKE AI booting…');
 
-            // Check for hardcoded Firebase config
             if (HARDCODED_FIREBASE_CONFIG && HARDCODED_FIREBASE_CONFIG.apiKey) {
                 console.log('🔥 Using hardcoded Firebase config.');
                 try {
@@ -2589,10 +2553,8 @@
                         setFbConfig(HARDCODED_FIREBASE_CONFIG);
                         console.log('🔥 Firebase initialized from hardcoded config');
 
-                        // Load messages
                         loadMessagesFromFirestore();
 
-                        // Load API key from Firestore
                         const key = await loadApiKeyFromFirestore();
                         if (key && isKeyValid(key)) {
                             GROQ_API_KEY = key;
@@ -2606,7 +2568,6 @@
                                 chatContainer.scrollTop = chatContainer.scrollHeight;
                             }, 500);
                         } else {
-                            // No key in Firestore, try localStorage
                             const stored = getStoredKey();
                             if (stored && isKeyValid(stored)) {
                                 GROQ_API_KEY = stored.trim();
@@ -2629,7 +2590,6 @@
                     showFbConfigOverlay();
                 }
             } else {
-                // No hardcoded config — check localStorage or show overlay
                 const fbConfig = getFbConfig();
                 if (fbConfig && fbConfig.apiKey) {
                     try {
@@ -2672,9 +2632,7 @@
                         showFbConfigOverlay();
                     }
                 } else {
-                    // No Firebase config — show overlay
                     showFbConfigOverlay();
-                    // Load API key from localStorage as fallback
                     const stored = getStoredKey();
                     if (stored && isKeyValid(stored)) {
                         GROQ_API_KEY = stored.trim();

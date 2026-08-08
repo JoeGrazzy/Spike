@@ -2957,6 +2957,9 @@
 </head>
 <body>
 
+    <!-- ===== HIDDEN AUDIO FOR NOTIFICATIONS ===== -->
+    <audio id="notificationSound" src="assets/notifications.mp3" preload="auto"></audio>
+
     <!-- ===== HEADER ===== -->
     <header class="feed-header">
         <a onclick="goToFeed()" class="logo-wrapper">
@@ -3162,7 +3165,7 @@
     <!-- ===== SCRIPTS ===== -->
     <script type="module">
         // ============================================================
-        // FEED.JS — COMPLETE FIXED (Regular users cannot report admin posts)
+        // FEED.JS — COMPLETE FIXED (Notification sound from assets)
         // ============================================================
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -3233,6 +3236,10 @@
         let currentMenuIsPinned = false;
         let currentMenuIsHidden = false;
 
+        // Notification tracking for sound
+        let previousNotificationCount = 0;
+        let isFirstNotificationCheck = true;
+
         // ============================================================
         // TOAST & CONFIRM (attached to window)
         // ============================================================
@@ -3299,6 +3306,99 @@
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') window.handleCancel(); });
 
         // ============================================================
+        // NOTIFICATION SOUND PLAYER
+        // ============================================================
+        function playNotificationSound() {
+            try {
+                const audio = document.getElementById('notificationSound');
+                if (audio) {
+                    // Reset and play
+                    audio.currentTime = 0;
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(err => {
+                            // Autoplay was blocked — fallback: try playing on user interaction later
+                            console.log('Notification sound autoplay blocked, will retry on next interaction');
+                            // Store intent to play on next user click
+                            if (!window._soundRetryListener) {
+                                window._soundRetryListener = function() {
+                                    try {
+                                        audio.currentTime = 0;
+                                        audio.play().catch(() => {});
+                                    } catch (e) {}
+                                    document.removeEventListener('click', window._soundRetryListener);
+                                    window._soundRetryListener = null;
+                                };
+                                document.addEventListener('click', window._soundRetryListener);
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                // Silently fail — sound is optional
+            }
+        }
+
+        // ============================================================
+        // NOTIFICATION BADGE WITH SOUND
+        // ============================================================
+        function updateNotificationBadge() {
+            const badge = document.getElementById('headerNotifBadge');
+            if (!badge) return;
+            try {
+                const cached = localStorage.getItem(CONFIG.storage.notifCacheKey);
+                const readStr = localStorage.getItem(CONFIG.storage.notifReadKey);
+                let notifs = [];
+                let readSet = new Set();
+                if (cached) { const parsed = JSON.parse(cached); if (Array.isArray(parsed)) notifs = parsed; }
+                if (readStr) { const parsed = JSON.parse(readStr); if (Array.isArray(parsed)) readSet = new Set(parsed); }
+                const unread = notifs.filter(n => !readSet.has(n.id)).length;
+
+                // === PLAY SOUND ON NEW NOTIFICATIONS ===
+                // Skip sound on first load (isFirstNotificationCheck = true)
+                if (!isFirstNotificationCheck) {
+                    // If unread count increased, play sound once per new notification
+                    if (unread > previousNotificationCount) {
+                        // Play sound for each new notification (but only once per increment)
+                        // We play a single sound when count increases, which is simpler and avoids spam
+                        playNotificationSound();
+                    }
+                } else {
+                    isFirstNotificationCheck = false;
+                }
+
+                // Update previous count for next check
+                previousNotificationCount = unread;
+
+                if (unread > 0) {
+                    badge.textContent = unread > 99 ? '99+' : unread;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) {
+                badge.style.display = 'none';
+                // Reset previous count on error to avoid false positives
+                previousNotificationCount = 0;
+            }
+        }
+
+        // Listen for storage changes (from notifications page)
+        window.addEventListener('storage', (e) => {
+            if (e.key === CONFIG.storage.notifCacheKey || e.key === CONFIG.storage.notifReadKey) {
+                // Only update if the change came from another tab
+                // We need to re-read the values to get the new state
+                setTimeout(() => updateNotificationBadge(), 50);
+            }
+        });
+
+        // Also listen for changes within the same tab via a custom event
+        // The notifications page will dispatch this event when notifications are marked as read
+        window.addEventListener('notificationsUpdated', () => {
+            updateNotificationBadge();
+        });
+
+        // ============================================================
         // HELPERS
         // ============================================================
         function escapeHTML(str) { if (!str) return ''; return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;',
@@ -3341,7 +3441,6 @@
                     data)); } catch (e) {} }
 
         function updateDropdownAvatar(avatarUrl) {
-            // Update dropdown avatar (if present)
             const dropdownAvatar = document.getElementById('dropdownAvatar');
             if (dropdownAvatar) {
                 if (avatarUrl && avatarUrl.trim() !== '') {
@@ -3351,7 +3450,6 @@
                     dropdownAvatar.textContent = '👤';
                 }
             }
-            // Update header profile avatar
             const headerProfile = document.getElementById('headerProfileBtn');
             if (headerProfile) {
                 if (avatarUrl && avatarUrl.trim() !== '') {
@@ -3465,46 +3563,12 @@
         }
 
         // ============================================================
-        // NOTIFICATION BADGE
-        // ============================================================
-        function updateNotificationBadge() {
-            const badge = document.getElementById('headerNotifBadge');
-            if (!badge) return;
-            try {
-                const cached = localStorage.getItem(CONFIG.storage.notifCacheKey);
-                const readStr = localStorage.getItem(CONFIG.storage.notifReadKey);
-                let notifs = [];
-                let readSet = new Set();
-                if (cached) { const parsed = JSON.parse(cached); if (Array.isArray(parsed)) notifs = parsed; }
-                if (readStr) { const parsed = JSON.parse(readStr); if (Array.isArray(parsed)) readSet = new Set(parsed); }
-                const unread = notifs.filter(n => !readSet.has(n.id)).length;
-                if (unread > 0) {
-                    badge.textContent = unread > 99 ? '99+' : unread;
-                    badge.style.display = 'flex';
-                } else {
-                    badge.style.display = 'none';
-                }
-            } catch (e) {
-                badge.style.display = 'none';
-            }
-        }
-
-        // Listen for storage changes (from notifications page)
-        window.addEventListener('storage', (e) => {
-            if (e.key === CONFIG.storage.notifCacheKey || e.key === CONFIG.storage.notifReadKey) {
-                updateNotificationBadge();
-            }
-        });
-
-        // ============================================================
         // UPDATED parsePostContent — detects emails & URLs
         // ============================================================
         function parsePostContent(text) {
             if (!text) return text;
-            // Escape HTML first to prevent injection
             let html = escapeHTML(text);
 
-            // Convert URLs (http/https/www) to clickable links
             const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
             html = html.replace(urlRegex, function(match) {
                 let href = match;
@@ -3512,19 +3576,16 @@
                 return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="url-link">${match}</a>`;
             });
 
-            // Convert email addresses to mailto links (pink/orange glowing)
             const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
             html = html.replace(emailRegex, function(email) {
                 return `<a href="mailto:${email}" class="email-link">${email}</a>`;
             });
 
-            // Convert hashtags and mentions
             html = html.replace(/#([\w]+)/g, '<span class="hashtag" onclick="searchHashtag(\'$1\')">#$1</span>');
             html = html.replace(/@([\w]+)/g, '<span class="mention" onclick="goToUser(\'$1\')">@$1</span>');
 
             return html;
         }
-        // Expose to window so inline onclick can use
         window.parsePostContent = parsePostContent;
 
         // ============================================================
@@ -3822,7 +3883,6 @@
             const isHidden = post.hidden === true;
             const isPinned = post.pinned === true;
 
-            // ===== CHECK IF POST AUTHOR IS ADMIN =====
             const authorUserData = getCachedUser(post.authorUid);
             const isAuthorAdmin = authorUserData && CONFIG.admin.emails.includes(authorUserData.email?.toLowerCase());
 
@@ -3886,7 +3946,7 @@
                         `;
             }
 
-            // ===== REPORT BUTTON: SHOW ONLY IF USER IS ADMIN OR POST AUTHOR IS NOT ADMIN =====
+            // REPORT BUTTON: SHOW ONLY IF USER IS ADMIN OR POST AUTHOR IS NOT ADMIN
             const showReportButton = !isOwner && (isAdmin || !isAuthorAdmin);
 
             let reportButtonHTML = "";
@@ -3965,7 +4025,7 @@
             const likes = post.likes || [];
             const isLiked = currentUser && likes.includes(currentUser.uid);
 
-            // ===== ACTION PANEL: HIDE REPORT BUTTON FOR ADMIN POSTS (unless user is admin) =====
+            // ACTION PANEL: HIDE REPORT BUTTON FOR ADMIN POSTS (unless user is admin)
             const showReportInPanel = !isOwner && (isAdmin || !isAuthorAdmin);
 
             return `
@@ -4767,7 +4827,7 @@
                     }
                 }
             });
-            // Update notification badge on load
+            // Update notification badge on load — this will set initial state and NOT play sound
             updateNotificationBadge();
         }
 
@@ -4820,9 +4880,9 @@
                     `<div class="empty-state"><span class="icon">🔒</span>Please sign in to view the feed.</div>`;
                 const container = document.getElementById('announcementContainer');
                 if (container) container.innerHTML = '';
-                // Hide notification badge
                 const badge = document.getElementById('headerNotifBadge');
                 if (badge) badge.style.display = 'none';
+                previousNotificationCount = 0;
             }
         });
 
@@ -4846,9 +4906,8 @@
                     e) {} }
             const annData = loadAnnouncement();
             renderAnnouncement(annData);
-            // Update notification badge on storage changes from notifications page
             if (e.key === CONFIG.storage.notifCacheKey || e.key === CONFIG.storage.notifReadKey) {
-                updateNotificationBadge();
+                setTimeout(() => updateNotificationBadge(), 50);
             }
         });
 
@@ -4860,6 +4919,7 @@
         renderAnnouncement(initialAnn);
 
         console.log('📱 Feed initialized — all features ready');
+        console.log('🔔 Notification sound plays once per new notification from assets/notifications.mp3');
         console.log('🔒 Regular users cannot report admin posts (eletexjoeytex@gmail.com)');
         console.log('🔔 Notifications & Profile moved to header');
     </script>

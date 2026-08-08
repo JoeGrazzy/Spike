@@ -87,7 +87,6 @@
             --card-bg: rgba(255, 255, 255, 0.9);
         }
 
-        /* Light mode overrides for text inputs */
         body.light-mode .create-textarea {
             background: var(--input-bg);
             border-color: var(--input-border);
@@ -332,7 +331,6 @@
             line-height: 1;
         }
 
-        /* ===== Header Right (new) ===== */
         .header-right {
             display: flex;
             align-items: center;
@@ -1158,7 +1156,7 @@
             font-weight: 600;
         }
 
-        /* ----- NEW: Email & URL link styling ----- */
+        /* Email & URL link styling */
         .post-content .email-link {
             color: #ff6b9d;
             background: linear-gradient(135deg, #ff6b9d, #ffa07a);
@@ -1183,7 +1181,6 @@
         .post-content .url-link:hover {
             color: var(--primary-hover);
         }
-        /* ----- end new ----- */
 
         .post-image-wrapper {
             width: 100%;
@@ -3165,7 +3162,7 @@
     <!-- ===== SCRIPTS ===== -->
     <script type="module">
         // ============================================================
-        // FEED.JS — COMPLETE FIXED VERSION
+        // FEED.JS — COMPLETE FIXED (Regular users cannot report admin posts)
         // ============================================================
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -3825,6 +3822,10 @@
             const isHidden = post.hidden === true;
             const isPinned = post.pinned === true;
 
+            // ===== CHECK IF POST AUTHOR IS ADMIN =====
+            const authorUserData = getCachedUser(post.authorUid);
+            const isAuthorAdmin = authorUserData && CONFIG.admin.emails.includes(authorUserData.email?.toLowerCase());
+
             const userData = getCachedUser(post.authorUid) || { name: post.authorName || 'User', avatar: '' };
             const authorName = userData.name || post.authorName || 'User';
             const timeAgo = formatTimeAgo(post.createdAt);
@@ -3885,8 +3886,11 @@
                         `;
             }
 
+            // ===== REPORT BUTTON: SHOW ONLY IF USER IS ADMIN OR POST AUTHOR IS NOT ADMIN =====
+            const showReportButton = !isOwner && (isAdmin || !isAuthorAdmin);
+
             let reportButtonHTML = "";
-            if (!isOwner && !isAdmin) {
+            if (showReportButton) {
                 reportButtonHTML =
                     `<button class="menu-trigger-btn" onclick="window.openReportModal('${postId}')" title="Report Post" style="font-size:0.8rem;">🚩</button>`;
             }
@@ -3961,6 +3965,9 @@
             const likes = post.likes || [];
             const isLiked = currentUser && likes.includes(currentUser.uid);
 
+            // ===== ACTION PANEL: HIDE REPORT BUTTON FOR ADMIN POSTS (unless user is admin) =====
+            const showReportInPanel = !isOwner && (isAdmin || !isAuthorAdmin);
+
             return `
                         <div class="post-card ${pinnedClass}" id="post-card-${postId}">
                             <div class="post-header">
@@ -4005,7 +4012,7 @@
                                     <button class="action-panel-btn" onclick="document.getElementById('comments-section-${postId}').classList.toggle('active')">💬 Comment</button>
                                     <button class="action-panel-btn primary" onclick="window.openRepostModal('${postId}')">🔁 Repost</button>
                                     <button class="action-panel-btn primary" onclick="window.openShareModal('${postId}')">🔗 Share</button>
-                                    ${!isOwner && !isAdmin ? `<button class="action-panel-btn" onclick="window.openReportModal('${postId}')" style="color:var(--error);">🚩 Report</button>` : ''}
+                                    ${showReportInPanel ? `<button class="action-panel-btn" onclick="window.openReportModal('${postId}')" style="color:var(--error);">🚩 Report</button>` : ''}
                                 </div>
                             </div>
 
@@ -4853,6 +4860,7 @@
         renderAnnouncement(initialAnn);
 
         console.log('📱 Feed initialized — all features ready');
+        console.log('🔒 Regular users cannot report admin posts (eletexjoeytex@gmail.com)');
         console.log('🔔 Notifications & Profile moved to header');
     </script>
 </body>

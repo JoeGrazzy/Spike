@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>SPIKE AI — Your Smart Companion</title>
+    <title>SPIKE AI — Real‑time Companion</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ─── FIREBASE SDK ─── -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
 
     <style>
         /* ─── SPIKE DESIGN SYSTEM ─── */
@@ -1177,6 +1183,225 @@
         .key-lock-card .status.success {
             color: var(--success);
         }
+
+        /* ─── FIREBASE CONFIG MODAL (kept for manual override) ─── */
+        .fb-config-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 13, 0.94);
+            backdrop-filter: blur(28px);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fb-config-overlay.active {
+            display: flex;
+            opacity: 1;
+            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fb-config-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 32px 28px 28px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.9);
+            animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        .fb-config-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 168, 132, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .fb-config-card>* {
+            position: relative;
+            z-index: 1;
+        }
+        .fb-config-card .fb-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ffca28, #ff6f00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 8px 30px rgba(255, 202, 40, 0.2);
+        }
+        .fb-config-card h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
+        .fb-config-card .sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin: 2px 0 16px 0;
+            line-height: 1.4;
+        }
+        .fb-config-card .sub code {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+        .fb-config-card .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .fb-config-card .field-group label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .fb-config-card .field-group textarea {
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            line-height: 1.5;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+        }
+        .fb-config-card .field-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 168, 132, 0.08);
+        }
+        .fb-config-card .field-group .helper {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        .fb-config-card .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .fb-config-card .actions button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: none;
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            touch-action: manipulation;
+            min-height: 48px;
+        }
+        .fb-config-card .actions button:active {
+            transform: scale(0.95);
+        }
+        .fb-config-card .actions .btn-connect {
+            background: var(--primary);
+            color: #0d0d0d;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .fb-config-card .actions .btn-connect:hover {
+            background: var(--primary-hover);
+        }
+        .fb-config-card .actions .btn-connect:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .fb-config-card .actions .btn-skip-fb {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .fb-config-card .actions .btn-skip-fb:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+        }
+        .fb-config-card .fb-status {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            min-height: 20px;
+        }
+        .fb-config-card .fb-status.error {
+            color: var(--error);
+        }
+        .fb-config-card .fb-status.success {
+            color: var(--success);
+        }
+        .fb-config-card .fb-status .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        /* ─── REAL‑TIME BADGE ─── */
+        .rt-badge {
+            background: rgba(0, 168, 132, 0.08);
+            border: 1px solid rgba(0, 168, 132, 0.15);
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .rt-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(0.7);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1188,6 +1413,9 @@
             <a href="feed.html" class="logo">SPIKE</a>
         </div>
         <div class="header-right">
+            <div class="rt-badge" id="rtBadge">
+                <span class="dot"></span> <span id="rtStatus">Live</span>
+            </div>
             <div class="lock-badge" id="lockBadge">
                 <span class="icon">🔒</span> <span id="lockStatus">Locked</span>
             </div>
@@ -1260,7 +1488,7 @@
         </div>
     </div>
 
-    <!-- ─── KEY LOCK OVERLAY (permanent lock) ─── -->
+    <!-- ─── KEY LOCK OVERLAY ─── -->
     <div class="key-lock-overlay" id="keyLockOverlay">
         <div class="key-lock-card" onclick="event.stopPropagation()">
             <div class="lock-icon">🔑</div>
@@ -1277,17 +1505,51 @@
         </div>
     </div>
 
+    <!-- ─── FIREBASE CONFIG OVERLAY (kept for manual override) ─── -->
+    <div class="fb-config-overlay" id="fbConfigOverlay">
+        <div class="fb-config-card" onclick="event.stopPropagation()">
+            <div class="fb-icon">🔥</div>
+            <h2>Connect to Firebase</h2>
+            <p class="sub">Paste your Firebase config to enable <strong>real‑time sync</strong> across all devices.</p>
+            <div class="field-group">
+                <label>Firebase Config (JSON)</label>
+                <textarea id="fbConfigInput" placeholder='{
+                    "apiKey": "AIzaSy...",
+                    "authDomain": "your-project.firebaseapp.com",
+                    "projectId": "your-project",
+                    "storageBucket": "your-project.appspot.com",
+                    "messagingSenderId": "123456789",
+                    "appId": "1:123456789:web:abcdef"
+                }'></textarea>
+                <div class="helper">Paste the entire config object from your Firebase console.</div>
+            </div>
+            <div class="fb-status" id="fbStatus">⚡ Your API key will sync across all devices.</div>
+            <div class="actions">
+                <button class="btn-skip-fb" id="fbSkip">Skip</button>
+                <button class="btn-connect" id="fbConnectBtn">🚀 Connect</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         /* ───────────────────────────────────────────────────────────────
-           SPIKE AI — PERMANENT KEY LOCK (never ask again)
+           SPIKE AI — FIREBASE REAL‑TIME INTEGRATION
            ─────────────────────────────────────────────────────────────── */
 
-        // ─── 🔒 HARDCODED API KEY (paste yours here to lock permanently) ───
-        // ─── If you put your key here, the page will NEVER ask again. ───
-        // ─── This works across all devices because it's in the file. ───
-        // ──────────────────────────────────────────────────────────────────
+        // ─── 🔒 HARDCODED API KEY (optional) ────────────────────────
         const HARDCODED_API_KEY = '';
-        // ──────────────────────────────────────────────────────────────────
+        // ──────────────────────────────────────────────────────────────
+
+        // ─── 🔥 HARDCODED FIREBASE CONFIG (from your environment) ──
+        const HARDCODED_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAm8ghbQ_lwJdNXEhWGos0eyi5wtvGuRR4",
+            authDomain: "grazzy-9e736.firebaseapp.com",
+            projectId: "grazzy-9e736",
+            storageBucket: "grazzy-9e736.firebasestorage.app",
+            messagingSenderId: "750326949170",
+            appId: "1:750326949170:web:5d19744aafc8675918632b"
+        };
+        // ──────────────────────────────────────────────────────────────
 
         // ─── TOAST & MODAL ──────────────────────────────────────────────
         let toastTimeout = null;
@@ -1410,8 +1672,202 @@
         const keyLockSkip = $('keyLockSkip');
         const keyLockStatus = $('keyLockStatus');
         const lockStatus = $('lockStatus');
+        const fbConfigOverlay = $('fbConfigOverlay');
+        const fbConfigInput = $('fbConfigInput');
+        const fbConnectBtn = $('fbConnectBtn');
+        const fbSkip = $('fbSkip');
+        const fbStatus = $('fbStatus');
+        const rtStatus = $('rtStatus');
 
-        // ─── PERMANENT KEY LOCK LOGIC ──────────────────────────────────
+        // ─── FIREBASE STATE ─────────────────────────────────────────────
+        let fbInitialized = false;
+        let db = null;
+        let messagesUnsubscribe = null;
+        let isFirstLoad = true;
+
+        // ─── FIREBASE CONFIG MANAGEMENT ────────────────────────────────
+
+        function getFbConfig() {
+            try {
+                const raw = localStorage.getItem('fb_config');
+                if (raw) return JSON.parse(raw);
+            } catch (_) { return null; }
+            return null;
+        }
+
+        function setFbConfig(config) {
+            try {
+                localStorage.setItem('fb_config', JSON.stringify(config));
+            } catch (_) {}
+        }
+
+        function isFbConfigured() {
+            return !!getFbConfig();
+        }
+
+        // ─── INITIALIZE FIREBASE ────────────────────────────────────────
+
+        function initFirebase(config) {
+            try {
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(config);
+                } else {
+                    // Check if already initialized with same project
+                    const app = firebase.app();
+                    if (app.options.projectId !== config.projectId) {
+                        firebase.initializeApp(config, 'spike_ai');
+                    }
+                }
+                db = firebase.firestore();
+                db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                    console.warn('Firestore persistence:', err);
+                });
+                fbInitialized = true;
+                return true;
+            } catch (e) {
+                console.error('Firebase init error:', e);
+                return false;
+            }
+        }
+
+        // ─── FIRESTORE OPERATIONS ──────────────────────────────────────
+
+        function getMessagesRef() {
+            return db.collection('spike_messages').orderBy('timestamp', 'asc');
+        }
+
+        function getConfigRef() {
+            return db.collection('spike_config').doc('app_config');
+        }
+
+        // ─── SAVE MESSAGE TO FIRESTORE ──────────────────────────────────
+
+        async function saveMessageToFirestore(role, content) {
+            if (!fbInitialized || !db) return false;
+            try {
+                await getMessagesRef().add({
+                    role: role,
+                    content: content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: new Date().toISOString()
+                });
+                return true;
+            } catch (e) {
+                console.warn('Failed to save message:', e);
+                return false;
+            }
+        }
+
+        // ─── LOAD MESSAGES FROM FIRESTORE ─────────────────────────────
+
+        function loadMessagesFromFirestore() {
+            if (!fbInitialized || !db) return;
+
+            if (messagesUnsubscribe) {
+                messagesUnsubscribe();
+                messagesUnsubscribe = null;
+            }
+
+            rtStatus.textContent = 'Syncing…';
+
+            messagesUnsubscribe = getMessagesRef().onSnapshot((snapshot) => {
+                // Clear existing messages (keep the welcome if no messages)
+                const existingMsgs = chatContainer.querySelectorAll('.msg:not(.keep-welcome)');
+                existingMsgs.forEach(el => el.remove());
+
+                let hasMessages = false;
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.role && data.content) {
+                        const div = document.createElement('div');
+                        div.className = `msg ${data.role}`;
+                        let html;
+                        if (data.role === 'assistant') {
+                            html = markdownToHtml(data.content);
+                        } else {
+                            html = data.content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br />');
+                        }
+                        div.innerHTML = html;
+
+                        if (data.timestamp) {
+                            const time = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
+                            const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const ts = document.createElement('div');
+                            ts.className = 'timestamp';
+                            ts.textContent = timeStr;
+                            div.appendChild(ts);
+                        } else {
+                            const ts = document.createElement('div');
+                            ts.className = 'timestamp';
+                            ts.textContent = 'just now';
+                            div.appendChild(ts);
+                        }
+
+                        chatContainer.appendChild(div);
+                        hasMessages = true;
+                    }
+                });
+
+                if (!hasMessages && isFirstLoad) {
+                    const welcome = document.createElement('div');
+                    welcome.className = 'msg assistant keep-welcome';
+                    welcome.innerHTML = `
+                            🌟 Hey! I'm <strong>SPIKE</strong> — your friendly AI companion, built to help you with everything about the SPIKE app.<br /><br />
+                            I can guide you through posting, rooms, communities, coins, verification, and more. Upload a file, ask about anything, and I'll always reply with warmth and clarity. Let's go! 🚀
+                            <div class="timestamp">just now</div>
+                        `;
+                    chatContainer.appendChild(welcome);
+                    isFirstLoad = false;
+                }
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                rtStatus.textContent = 'Live';
+                document.querySelector('.rt-badge .dot').style.background = 'var(--primary)';
+
+                if (isFirstLoad) isFirstLoad = false;
+            }, (error) => {
+                console.warn('Firestore listener error:', error);
+                rtStatus.textContent = 'Offline';
+                document.querySelector('.rt-badge .dot').style.background = 'var(--warning)';
+            });
+        }
+
+        // ─── LOAD API KEY FROM FIRESTORE ──────────────────────────────
+
+        async function loadApiKeyFromFirestore() {
+            if (!fbInitialized || !db) return null;
+            try {
+                const doc = await getConfigRef().get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.groqApiKey && isKeyValid(data.groqApiKey)) {
+                        return data.groqApiKey.trim();
+                    }
+                }
+                return null;
+            } catch (e) {
+                console.warn('Failed to load API key from Firestore:', e);
+                return null;
+            }
+        }
+
+        // ─── SAVE API KEY TO FIRESTORE ──────────────────────────────────
+
+        async function saveApiKeyToFirestore(key) {
+            if (!fbInitialized || !db) return false;
+            try {
+                await getConfigRef().set({
+                    groqApiKey: key,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                return true;
+            } catch (e) {
+                console.warn('Failed to save API key to Firestore:', e);
+                return false;
+            }
+        }
+
+        // ─── KEY VALIDATION ────────────────────────────────────────────
 
         function isKeyValid(key) {
             return key && typeof key === 'string' && key.trim().startsWith('gsk_') && key.trim().length > 20;
@@ -1448,25 +1904,35 @@
             }
         }
 
-        // ─── LOAD API KEY (hardcoded → localStorage → prompt) ────────
+        // ─── LOAD API KEY (hardcoded → Firestore → localStorage) ────
 
-        function loadApiKey() {
-            // 1. Hardcoded key (highest priority — permanent across devices)
+        async function loadApiKey() {
+            // 1. Hardcoded key (highest priority)
             if (HARDCODED_API_KEY && isKeyValid(HARDCODED_API_KEY)) {
                 GROQ_API_KEY = HARDCODED_API_KEY.trim();
-                // Also save to localStorage for consistency
                 setStoredKey(GROQ_API_KEY);
                 showToast('🔒 Permanently locked (hardcoded)', 'success', 'SPIKE Ready');
                 updateLockBadge();
                 return true;
             }
 
-            // 2. Check localStorage
+            // 2. Firestore (if initialized)
+            if (fbInitialized && db) {
+                const firestoreKey = await loadApiKeyFromFirestore();
+                if (firestoreKey && isKeyValid(firestoreKey)) {
+                    GROQ_API_KEY = firestoreKey;
+                    setStoredKey(GROQ_API_KEY);
+                    updateLockBadge();
+                    showToast('✅ API key loaded from cloud', 'success', 'SPIKE Ready');
+                    return true;
+                }
+            }
+
+            // 3. localStorage
             const stored = getStoredKey();
             if (stored && isKeyValid(stored)) {
                 GROQ_API_KEY = stored.trim();
                 updateLockBadge();
-                // If locked flag is missing, set it
                 if (!isKeyLocked()) {
                     try { localStorage.setItem('groq_api_locked', 'true'); } catch (_) {}
                 }
@@ -1474,7 +1940,7 @@
                 return true;
             }
 
-            // 3. No key found — show the permanent lock overlay
+            // 4. No key — show lock overlay
             showKeyLockOverlay();
             return false;
         }
@@ -1494,7 +1960,7 @@
             keyLockOverlay.classList.remove('active');
         }
 
-        function handleKeyLock() {
+        async function handleKeyLock() {
             const key = keyLockInput.value.trim();
             if (!isKeyValid(key)) {
                 keyLockStatus.textContent = '❌ Invalid key. Must start with "gsk_" and be at least 20 chars.';
@@ -1504,28 +1970,152 @@
                 return;
             }
 
-            // Lock it!
             GROQ_API_KEY = key;
             setStoredKey(key);
             try { localStorage.setItem('groq_api_locked', 'true'); } catch (_) {}
 
+            if (fbInitialized && db) {
+                const saved = await saveApiKeyToFirestore(key);
+                if (saved) {
+                    showToast('🔒 API key synced to cloud!', 'success', 'SPIKE Locked');
+                } else {
+                    showToast('🔒 API key locked locally.', 'success', 'SPIKE Locked');
+                }
+            } else {
+                showToast('🔒 Permanently locked!', 'success', 'SPIKE Locked');
+            }
+
             hideKeyLockOverlay();
             updateLockBadge();
-            showToast('🔒 Permanently locked! Never ask again.', 'success', 'SPIKE Locked');
-
-            // Add a welcome message
-            addChatMessage('assistant', '🔒 <strong>API key is now permanently locked.</strong> This page will never ask you for it again — even on other devices. 🚀');
+            addChatMessage('assistant',
+                '🔒 <strong>API key is now permanently locked.</strong> It\'s also synced to the cloud, so you\'ll never need to enter it again — even on new devices. 🚀'
+            );
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function handleKeyLockSkip() {
             hideKeyLockOverlay();
             showToast('⚠️ No key set. AI features will be limited.', 'warning', 'Skipped');
-            addChatMessage('assistant', '⚠️ You skipped entering an API key. I can still help with file uploads and local features, but I won\'t be able to use Groq AI. You can always lock your key later by reloading the page. 🔑');
+            addChatMessage('assistant',
+                '⚠️ You skipped entering an API key. I can still help with file uploads and local features, but I won\'t be able to use Groq AI. You can always lock your key later by reloading the page. 🔑'
+            );
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // ─── EVENTS FOR KEY LOCK ──────────────────────────────────────
+        // ─── FIREBASE CONFIG OVERLAY (kept for manual override) ──────
+
+        function showFbConfigOverlay() {
+            fbConfigOverlay.classList.add('active');
+            // Pre-fill with hardcoded config if available
+            if (HARDCODED_FIREBASE_CONFIG && HARDCODED_FIREBASE_CONFIG.apiKey) {
+                fbConfigInput.value = JSON.stringify(HARDCODED_FIREBASE_CONFIG, null, 4);
+                fbStatus.textContent = '✅ Config pre-filled. Click Connect to use it.';
+                fbStatus.className = 'fb-status success';
+            } else {
+                fbConfigInput.value = '';
+                fbStatus.textContent = '⚡ Your API key will sync across all devices.';
+                fbStatus.className = 'fb-status';
+            }
+            fbConnectBtn.disabled = false;
+            fbConfigInput.focus();
+        }
+
+        function hideFbConfigOverlay() {
+            fbConfigOverlay.classList.remove('active');
+        }
+
+        async function handleFbConnect() {
+            const raw = fbConfigInput.value.trim();
+            if (!raw) {
+                fbStatus.textContent = '❌ Please paste your Firebase config.';
+                fbStatus.className = 'fb-status error';
+                return;
+            }
+
+            let config;
+            try {
+                config = JSON.parse(raw);
+            } catch (e) {
+                fbStatus.textContent = '❌ Invalid JSON. Please paste a valid config object.';
+                fbStatus.className = 'fb-status error';
+                return;
+            }
+
+            const required = ['apiKey', 'projectId', 'appId'];
+            for (const field of required) {
+                if (!config[field]) {
+                    fbStatus.textContent = `❌ Missing "${field}" in config.`;
+                    fbStatus.className = 'fb-status error';
+                    return;
+                }
+            }
+
+            fbStatus.textContent = '⏳ Connecting to Firebase…';
+            fbStatus.className = 'fb-status';
+            fbConnectBtn.disabled = true;
+
+            try {
+                const success = initFirebase(config);
+                if (success) {
+                    setFbConfig(config);
+                    hideFbConfigOverlay();
+                    showToast('🔥 Firebase connected!', 'success', 'Real‑time enabled');
+
+                    loadMessagesFromFirestore();
+
+                    const key = await loadApiKeyFromFirestore();
+                    if (key && isKeyValid(key)) {
+                        GROQ_API_KEY = key;
+                        setStoredKey(key);
+                        updateLockBadge();
+                        showToast('🔑 API key loaded from cloud', 'success', 'SPIKE Ready');
+                        addChatMessage('assistant',
+                            '☁️ <strong>API key loaded from the cloud!</strong> Your key is now synced across all devices. 🔒'
+                        );
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    } else {
+                        showKeyLockOverlay();
+                    }
+
+                    rtStatus.textContent = 'Live';
+                    document.querySelector('.rt-badge .dot').style.background = 'var(--primary)';
+                } else {
+                    fbStatus.textContent = '❌ Failed to initialize Firebase. Check your config.';
+                    fbStatus.className = 'fb-status error';
+                    fbConnectBtn.disabled = false;
+                }
+            } catch (e) {
+                fbStatus.textContent = `❌ Error: ${e.message}`;
+                fbStatus.className = 'fb-status error';
+                fbConnectBtn.disabled = false;
+                console.error(e);
+            }
+        }
+
+        function handleFbSkip() {
+            hideFbConfigOverlay();
+            showToast('⚠️ Firebase skipped. Messages won\'t sync.', 'warning', 'Offline mode');
+            loadApiKey();
+            addChatMessage('assistant',
+                '⚠️ Firebase is not connected. Your messages will not sync across devices. You can still use SPIKE locally. 🔑'
+            );
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // ─── FIREBASE CONFIG EVENTS ──────────────────────────────────
+
+        fbConnectBtn.addEventListener('click', handleFbConnect);
+
+        fbConfigInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                handleFbConnect();
+            }
+        });
+
+        fbSkip.addEventListener('click', handleFbSkip);
+
+        // ─── KEY LOCK EVENTS ──────────────────────────────────────────
 
         keyLockBtn.addEventListener('click', handleKeyLock);
 
@@ -1538,26 +2128,24 @@
 
         keyLockSkip.addEventListener('click', handleKeyLockSkip);
 
-        // If user clicks outside the card, do nothing (must use buttons)
-
         // ─── COMPRESSED SPIKE KNOWLEDGE ──────────────────────────────
 
         const SPIKE_KNOWLEDGE = `
-        You are SPIKE, the official AI assistant for the SPIKE social platform – friendly, warm, and helpful.
+            You are SPIKE, the official AI assistant for the SPIKE social platform – friendly, warm, and helpful.
 
-        SPIKE features:
-        • Feed: post text/images/videos, like, comment, repost, share, pin, hide, delete.
-        • Profile: customizable fields (bio, location, social links, interests) with public/private privacy.
-        • Verification Badge: earn by meeting requirements (1 yr active, 500 friends, 1000 posts) then apply with payment receipt.
-        • Friends: send/accept/decline friend requests; block/unblock users.
-        • Messaging: chat with media (images, voice notes), voice/video calls, read receipts, typing indicators.
-        • Communities: join (public/private), post, comment, like; admins manage requests, members, reports, settings.
-        • Coins & Economy: use coins for VIP (200), Premium (500), Elite (1000) tiers – each unlocks features (stickers, voice, images, polls, pins). Buy coins via WhatsApp admin (packages from $0.09). Send coins using SP:ID/amount.
-        • Settings: dark/light, accent color, privacy controls, notification preferences, muted words.
-        • Admin: announcements, report management, community oversight, maintenance mode, coin management.
+            SPIKE features:
+            • Feed: post text/images/videos, like, comment, repost, share, pin, hide, delete.
+            • Profile: customizable fields (bio, location, social links, interests) with public/private privacy.
+            • Verification Badge: earn by meeting requirements (1 yr active, 500 friends, 1000 posts) then apply with payment receipt.
+            • Friends: send/accept/decline friend requests; block/unblock users.
+            • Messaging: chat with media (images, voice notes), voice/video calls, read receipts, typing indicators.
+            • Communities: join (public/private), post, comment, like; admins manage requests, members, reports, settings.
+            • Coins & Economy: use coins for VIP (200), Premium (500), Elite (1000) tiers – each unlocks features (stickers, voice, images, polls, pins). Buy coins via WhatsApp admin (packages from $0.09). Send coins using SP:ID/amount.
+            • Settings: dark/light, accent color, privacy controls, notification preferences, muted words.
+            • Admin: announcements, report management, community oversight, maintenance mode, coin management.
 
-        Always reply with warmth, use emojis naturally, give step-by-step guidance, and relate everything to SPIKE. If you don't know, say so and suggest where to look.
-        `;
+            Always reply with warmth, use emojis naturally, give step-by-step guidance, and relate everything to SPIKE. If you don't know, say so and suggest where to look.
+            `;
 
         // ─── MARKDOWN PARSER ───────────────────────────────────────────
 
@@ -1679,6 +2267,11 @@
 
             chatContainer.appendChild(div);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            if (fbInitialized && db) {
+                saveMessageToFirestore(role, content);
+            }
+
             return div;
         }
 
@@ -1734,7 +2327,6 @@
         async function askAI(promptText) {
             if (!GROQ_API_KEY) {
                 showToast('⚠️ No API key. Please lock your key first.', 'error', 'Missing Key');
-                // Show the lock overlay again
                 showKeyLockOverlay();
                 return;
             }
@@ -1984,23 +2576,122 @@
 
         // ─── BOOT ──────────────────────────────────────────────────────
 
-        // Load the API key (hardcoded → localStorage → prompt)
-        const keyLoaded = loadApiKey();
+        async function boot() {
+            console.log('⚡ SPIKE AI booting…');
 
-        // If key was loaded successfully, show a welcome message
-        if (keyLoaded && GROQ_API_KEY) {
-            // Add a subtle lock confirmation
-            setTimeout(() => {
-                addChatMessage('assistant', '🔒 <strong>API key is permanently locked.</strong> This page will never ask you for it again — even on other devices. Just paste your key in the code or use the lock overlay once. 🚀');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }, 600);
+            // Check for hardcoded Firebase config
+            if (HARDCODED_FIREBASE_CONFIG && HARDCODED_FIREBASE_CONFIG.apiKey) {
+                console.log('🔥 Using hardcoded Firebase config.');
+                try {
+                    const success = initFirebase(HARDCODED_FIREBASE_CONFIG);
+                    if (success) {
+                        fbInitialized = true;
+                        setFbConfig(HARDCODED_FIREBASE_CONFIG);
+                        console.log('🔥 Firebase initialized from hardcoded config');
+
+                        // Load messages
+                        loadMessagesFromFirestore();
+
+                        // Load API key from Firestore
+                        const key = await loadApiKeyFromFirestore();
+                        if (key && isKeyValid(key)) {
+                            GROQ_API_KEY = key;
+                            setStoredKey(key);
+                            updateLockBadge();
+                            showToast('☁️ API key loaded from cloud', 'success', 'SPIKE Ready');
+                            setTimeout(() => {
+                                addChatMessage('assistant',
+                                    '☁️ <strong>API key loaded from the cloud!</strong> Your key is synced across all devices. 🔒'
+                                );
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }, 500);
+                        } else {
+                            // No key in Firestore, try localStorage
+                            const stored = getStoredKey();
+                            if (stored && isKeyValid(stored)) {
+                                GROQ_API_KEY = stored.trim();
+                                updateLockBadge();
+                                await saveApiKeyToFirestore(GROQ_API_KEY);
+                                showToast('✅ API key synced to cloud', 'success', 'SPIKE Ready');
+                            } else {
+                                showKeyLockOverlay();
+                            }
+                        }
+
+                        rtStatus.textContent = 'Live';
+                        document.querySelector('.rt-badge .dot').style.background = 'var(--primary)';
+                    } else {
+                        console.warn('Failed to initialize Firebase with hardcoded config');
+                        showFbConfigOverlay();
+                    }
+                } catch (e) {
+                    console.warn('Firebase init error:', e);
+                    showFbConfigOverlay();
+                }
+            } else {
+                // No hardcoded config — check localStorage or show overlay
+                const fbConfig = getFbConfig();
+                if (fbConfig && fbConfig.apiKey) {
+                    try {
+                        const success = initFirebase(fbConfig);
+                        if (success) {
+                            fbInitialized = true;
+                            console.log('🔥 Firebase initialized from stored config');
+                            loadMessagesFromFirestore();
+
+                            const key = await loadApiKeyFromFirestore();
+                            if (key && isKeyValid(key)) {
+                                GROQ_API_KEY = key;
+                                setStoredKey(key);
+                                updateLockBadge();
+                                showToast('☁️ API key loaded from cloud', 'success', 'SPIKE Ready');
+                                setTimeout(() => {
+                                    addChatMessage('assistant',
+                                        '☁️ <strong>API key loaded from the cloud!</strong> Your key is synced across all devices. 🔒'
+                                    );
+                                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                                }, 500);
+                            } else {
+                                const stored = getStoredKey();
+                                if (stored && isKeyValid(stored)) {
+                                    GROQ_API_KEY = stored.trim();
+                                    updateLockBadge();
+                                    await saveApiKeyToFirestore(GROQ_API_KEY);
+                                    showToast('✅ API key synced to cloud', 'success', 'SPIKE Ready');
+                                } else {
+                                    showKeyLockOverlay();
+                                }
+                            }
+
+                            rtStatus.textContent = 'Live';
+                            document.querySelector('.rt-badge .dot').style.background = 'var(--primary)';
+                        } else {
+                            showFbConfigOverlay();
+                        }
+                    } catch (e) {
+                        showFbConfigOverlay();
+                    }
+                } else {
+                    // No Firebase config — show overlay
+                    showFbConfigOverlay();
+                    // Load API key from localStorage as fallback
+                    const stored = getStoredKey();
+                    if (stored && isKeyValid(stored)) {
+                        GROQ_API_KEY = stored.trim();
+                        updateLockBadge();
+                        showToast('✅ API key loaded locally', 'success', 'SPIKE Ready');
+                    }
+                }
+            }
+
+            console.log(`🔑 Key status: ${GROQ_API_KEY ? 'LOCKED ✅' : 'UNLOCKED ❌'}`);
+            if (HARDCODED_API_KEY) {
+                console.log('📌 Hardcoded key detected — permanent across all devices.');
+            }
         }
 
-        console.log('⚡ SPIKE AI loaded — 🔒 permanent key lock enabled.');
-        console.log(`🔑 Key status: ${GROQ_API_KEY ? 'LOCKED ✅' : 'UNLOCKED ❌'}`);
-        if (HARDCODED_API_KEY) {
-            console.log('📌 Hardcoded key detected — permanent across all devices.');
-        }
+        // ─── START ──────────────────────────────────────────────────────
+        boot();
     </script>
 </body>
 </html>

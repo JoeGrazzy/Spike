@@ -1467,7 +1467,7 @@
             <h2>🔒 Permanent API Lock</h2>
             <p>Paste your Groq API key once, and it will be <strong>permanently locked</strong> to this page.<br />Never ask again — on any device.</p>
             <div class="input-group">
-                <input type="text"***********************" autocomplete="off" spellcheck="false" />
+                <input type="text" id="keyLockInput" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false" />
             </div>
             <div class="status" id="keyLockStatus">Enter your key to lock it permanently.</div>
             <div class="actions">
@@ -1508,11 +1508,10 @@
            SPIKE AI — FIREBASE REAL‑TIME INTEGRATION
            ─────────────────────────────────────────────────────────────── */
 
-        // ─── 🔒 HARDCODED API KEY (optional) ────────────────────────
-        const HARDCODED_API_KEY = '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';
-        // ──────────────────────────────────────────────────────────────
+        // ─── 🔒 PASTE YOUR GROQ API KEY HERE ───────────────────────
+        const HARDCODED_API_KEY = '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';   // 👈 Put your key inside the quotes
 
-        // ─── 🔥 HARDCODED FIREBASE CONFIG (from your environment) ──
+        // ─── 🔥 FIREBASE CONFIG (already set) ──────────────────────
         const HARDCODED_FIREBASE_CONFIG = {
             apiKey: "AIzaSyAm8ghbQ_lwJdNXEhWGos0eyi5wtvGuRR4",
             authDomain: "grazzy-9e736.firebaseapp.com",
@@ -1521,7 +1520,6 @@
             messagingSenderId: "750326949170",
             appId: "1:750326949170:web:5d19744aafc8675918632b"
         };
-        // ──────────────────────────────────────────────────────────────
 
         // ─── TOAST & MODAL ──────────────────────────────────────────────
         let toastTimeout = null;
@@ -1671,10 +1669,6 @@
             try {
                 localStorage.setItem('fb_config', JSON.stringify(config));
             } catch (_) {}
-        }
-
-        function isFbConfigured() {
-            return !!getFbConfig();
         }
 
         // ─── INITIALIZE FIREBASE ────────────────────────────────────────

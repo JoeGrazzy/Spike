@@ -67,6 +67,8 @@
             --input-border: rgba(255, 255, 255, 0.08);
             --input-focus-bg: rgba(7, 11, 16, 0.85);
             --card-bg: rgba(20, 32, 48, 0.7);
+            --gold: #ffd700;
+            --purple: #a855f7;
         }
 
         /* ============================================================
@@ -2993,6 +2995,8 @@
                         <button class="dropdown-item" onclick="navigateTo('community')"><span class="icon">👨‍👩‍👧‍👦</span> Community</button>
                         <button class="dropdown-item" onclick="navigateTo('rooms')"><span class="icon">💞</span> Fun Rooms <span class="badge primary">Live</span></button>
                         <button class="dropdown-item" onclick="navigateTo('messages')"><span class="icon">💬</span> Messages <span class="badge danger" id="dropdownChatBadge" style="display:none;">0</span></button>
+                        <!-- NEW: SPIKE AI -->
+                        <button class="dropdown-item" onclick="navigateTo('studio_ai')"><span class="icon">🤖</span> SPIKE AI <span class="badge primary">✨</span></button>
                     </div>
                     <div class="dropdown-section">
                         <div class="dropdown-label">Account</div>
@@ -3599,6 +3603,7 @@
         window.goToAdmin = function() { window.location.href = "administrator.html"; };
         window.goToCommunity = function() { window.location.href = "community.html"; };
         window.goToRooms = function() { window.location.href = "rooms.html"; };
+        window.goToStudioAi = function() { window.location.href = "studio_ai.html"; };
 
         window.togglePremiumMenu = function() {
             const dropdown = document.getElementById('premiumDropdown');
@@ -3620,7 +3625,8 @@
                 messages: goToMessages,
                 notifications: goToNotifications,
                 admin: goToAdmin,
-                profile: goToProfile
+                profile: goToProfile,
+                studio_ai: goToStudioAi
             };
             if (map[dest]) map[dest]();
         };
@@ -4921,7 +4927,7 @@
         console.log('📱 Feed initialized — all features ready');
         console.log('🔔 Notification sound plays once per new notification from assets/notifications.mp3');
         console.log('🔒 Regular users cannot report admin posts (eletexjoeytex@gmail.com)');
-        console.log('🔔 Notifications & Profile moved to header');
+        console.log('🤖 SPIKE AI added to menu — link to studio_ai.html');
     </script>
 </body>
 </html>
